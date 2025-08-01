@@ -1,4 +1,4 @@
-add_library(trigdx reference.cpp)
+add_library(trigdx reference.cpp lookup.cpp)
 
 target_include_directories(trigdx PUBLIC ${PROJECT_SOURCE_DIR}/include)
 

@@ -1,12 +1,15 @@
 #pragma once
 
-#include <cmath>
-#include <vector>
+#include <cstddef>
+#include <memory>
 
 #include "interface.hpp"
 
 template <size_t NR_SAMPLES> class LookupBackend : public Backend {
 public:
+  LookupBackend();
+  ~LookupBackend() override;
+
   void init() override;
   void compute_sinf(size_t n, const float *x, float *s) const override;
   void compute_cosf(size_t n, const float *x, float *c) const override;
@@ -14,9 +17,6 @@ public:
                        float *c) const override;
 
 private:
-  std::vector<float> lookup;
-  static constexpr size_t MASK = NR_SAMPLES - 1;
-  static constexpr float SCALE = NR_SAMPLES / (2.0f * float(M_PI));
+  struct Impl;
+  std::unique_ptr<Impl> impl;
 };
-
-#include "lookup.tpp" // include implementation
