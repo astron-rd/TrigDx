@@ -10,6 +10,10 @@ FetchContent_MakeAvailable(catch2)
 add_executable(test_lookup test_lookup.cpp)
 target_link_libraries(test_lookup PRIVATE trigdx Catch2::Catch2WithMain)
 
+# LookupAVX backend test
+add_executable(test_lookup_avx test_lookup_avx.cpp)
+target_link_libraries(test_lookup_avx PRIVATE trigdx Catch2::Catch2WithMain)
+
 # MKL backend test
 if(USE_MKL)
   add_executable(test_mkl test_mkl.cpp)
