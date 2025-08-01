@@ -174,7 +174,8 @@ LookupAVXBackend<NR_SAMPLES>::LookupAVXBackend()
 template <std::size_t NR_SAMPLES>
 LookupAVXBackend<NR_SAMPLES>::~LookupAVXBackend() = default;
 
-template <std::size_t NR_SAMPLES> void LookupAVXBackend<NR_SAMPLES>::init() {
+template <std::size_t NR_SAMPLES>
+void LookupAVXBackend<NR_SAMPLES>::init(size_t) {
   impl->init();
 }
 

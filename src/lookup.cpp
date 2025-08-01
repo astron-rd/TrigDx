@@ -46,7 +46,7 @@ LookupBackend<NR_SAMPLES>::LookupBackend() : impl(std::make_unique<Impl>()) {}
 template <size_t NR_SAMPLES>
 LookupBackend<NR_SAMPLES>::~LookupBackend() = default;
 
-template <size_t NR_SAMPLES> void LookupBackend<NR_SAMPLES>::init() {
+template <size_t NR_SAMPLES> void LookupBackend<NR_SAMPLES>::init(size_t) {
   impl->init();
 }
 

@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <cstddef>
@@ -5,10 +6,10 @@
 
 #include "interface.hpp"
 
-template <size_t NR_SAMPLES> class LookupBackend : public Backend {
+class GPUBackend : public Backend {
 public:
-  LookupBackend();
-  ~LookupBackend() override;
+  GPUBackend();
+  ~GPUBackend() override;
 
   void init(size_t n = 0) override;
   void compute_sinf(size_t n, const float *x, float *s) const override;

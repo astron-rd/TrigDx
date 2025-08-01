@@ -8,7 +8,7 @@ public:
   virtual ~Backend() = default;
 
   // Optional initialization
-  virtual void init() {}
+  virtual void init(size_t n = 0) {}
 
   // Compute sine for n elements
   virtual void compute_sinf(size_t n, const float *x, float *s) const = 0;

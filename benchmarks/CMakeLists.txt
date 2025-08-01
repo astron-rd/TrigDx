@@ -11,3 +11,8 @@ if(USE_MKL)
   add_executable(benchmark_mkl benchmark_mkl.cpp)
   target_link_libraries(benchmark_mkl PRIVATE trigdx)
 endif()
+
+if(USE_GPU)
+  add_executable(benchmark_gpu benchmark_gpu.cpp)
+  target_link_libraries(benchmark_gpu PRIVATE trigdx gpu)
+endif()

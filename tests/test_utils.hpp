@@ -18,7 +18,7 @@ template <typename Backend> inline void test_sinf(float tol) {
 
   ReferenceBackend ref;
   Backend backend;
-  backend.init();
+  backend.init(N);
 
   ref.compute_sinf(N, x.data(), s_ref.data());
   backend.compute_sinf(N, x.data(), s.data());
@@ -37,7 +37,7 @@ template <typename Backend> inline void test_cosf(float tol) {
 
   ReferenceBackend ref;
   Backend backend;
-  backend.init();
+  backend.init(N);
 
   ref.compute_cosf(N, x.data(), c_ref.data());
   backend.compute_cosf(N, x.data(), c.data());
@@ -56,7 +56,7 @@ template <typename Backend> inline void test_sincosf(float tol) {
 
   ReferenceBackend ref;
   Backend backend;
-  backend.init();
+  backend.init(N);
 
   ref.compute_sincosf(N, x.data(), s_ref.data(), c_ref.data());
   backend.compute_sincosf(N, x.data(), s.data(), c.data());

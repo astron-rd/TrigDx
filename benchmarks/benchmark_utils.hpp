@@ -25,7 +25,7 @@ template <typename Backend> inline void benchmark_sinf() {
     x[i] = (i % 360) * 0.0174533f; // degrees to radians
 
   Backend backend;
-  backend.init();
+  backend.init(N);
 
   auto start = std::chrono::high_resolution_clock::now();
   backend.compute_sinf(N, x.data(), s.data());
@@ -44,7 +44,7 @@ template <typename Backend> inline void benchmark_cosf() {
     x[i] = (i % 360) * 0.0174533f; // degrees to radians
 
   Backend backend;
-  backend.init();
+  backend.init(N);
 
   auto start = std::chrono::high_resolution_clock::now();
   backend.compute_cosf(N, x.data(), c.data());
@@ -63,7 +63,7 @@ template <typename Backend> inline void benchmark_sincosf() {
     x[i] = (i % 360) * 0.0174533f; // degrees to radians
 
   Backend backend;
-  backend.init();
+  backend.init(N);
 
   auto start = std::chrono::high_resolution_clock::now();
   backend.compute_sincosf(N, x.data(), s.data(), c.data());
