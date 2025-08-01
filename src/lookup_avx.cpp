@@ -14,7 +14,7 @@ template <std::size_t NR_SAMPLES> struct LookupAVXBackend<NR_SAMPLES>::Impl {
   void init() {
     lookup.resize(NR_SAMPLES);
     for (std::size_t i = 0; i < NR_SAMPLES; ++i) {
-      lookup[i] = std::sinf(i * (2.0f * float(M_PI) / NR_SAMPLES));
+      lookup[i] = sinf(i * (2.0f * float(M_PI) / NR_SAMPLES));
     }
   }
 
