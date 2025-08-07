@@ -16,3 +16,8 @@ if(USE_GPU)
   add_executable(benchmark_gpu benchmark_gpu.cpp)
   target_link_libraries(benchmark_gpu PRIVATE trigdx gpu)
 endif()
+
+if(USE_XSIMD)
+  add_executable(benchmark_lookup_xsimd benchmark_lookup_xsimd.cpp)
+  target_link_libraries(benchmark_lookup_xsimd PRIVATE trigdx)
+endif()
