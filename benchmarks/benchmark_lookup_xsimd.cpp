@@ -2,12 +2,29 @@
 
 #include "benchmark_utils.hpp"
 
-int main() {
-  benchmark_sinf<LookupXSIMDBackend<16384>>();
-  benchmark_cosf<LookupXSIMDBackend<16384>>();
-  benchmark_sincosf<LookupXSIMDBackend<16384>>();
+template <typename Backend> void register_benchmarks() {
+  BENCHMARK_TEMPLATE(benchmark_sinf, Backend)
+      ->Unit(benchmark::kMillisecond)
+      ->Arg(1e5)
+      ->Arg(1e6)
+      ->Arg(1e7);
+  BENCHMARK_TEMPLATE(benchmark_cosf, Backend)
+      ->Unit(benchmark::kMillisecond)
+      ->Arg(1e5)
+      ->Arg(1e6)
+      ->Arg(1e7);
+  BENCHMARK_TEMPLATE(benchmark_sincosf, Backend)
+      ->Unit(benchmark::kMillisecond)
+      ->Arg(1e5)
+      ->Arg(1e6)
+      ->Arg(1e7);
+}
 
-  benchmark_sinf<LookupXSIMDBackend<32768>>();
-  benchmark_cosf<LookupXSIMDBackend<32768>>();
-  benchmark_sincosf<LookupXSIMDBackend<32768>>();
+int main(int argc, char **argv) {
+  ::benchmark::Initialize(&argc, argv);
+
+  register_benchmarks<LookupXSIMDBackend<16384>>();
+  register_benchmarks<LookupXSIMDBackend<32768>>();
+
+  return ::benchmark::RunSpecifiedBenchmarks();
 }
