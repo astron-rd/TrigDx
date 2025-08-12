@@ -33,3 +33,7 @@ if(TRIGDX_USE_XSIMD)
   target_sources(trigdx PRIVATE lookup_xsimd.cpp)
   target_link_libraries(trigdx PRIVATE xsimd)
 endif()
+
+target_include_directories(
+  trigdx INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)

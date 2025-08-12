@@ -10,6 +10,10 @@ option(TRIGDX_USE_XSIMD "Enable XSIMD backend" OFF)
 option(TRIGDX_BUILD_TESTS "Build tests" ON)
 option(TRIGDX_BUILD_BENCHMARKS "Build tests" ON)
 
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/trigdx_config.hpp.in
+  ${CMAKE_CURRENT_BINARY_DIR}/include/trigdx/trigdx_config.hpp @ONLY)
+
 if(TRIGDX_BUILD_TESTS OR TRIGDX_BUILD_BENCHMARKS)
   include(FetchContent)
 endif()

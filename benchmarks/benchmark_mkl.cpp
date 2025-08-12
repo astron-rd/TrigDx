@@ -1,4 +1,4 @@
-#include <trigdx/mkl.hpp>
+#include <trigdx/trigdx.hpp>
 
 #include "benchmark_utils.hpp"
 
