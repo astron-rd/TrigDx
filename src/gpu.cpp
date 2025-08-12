@@ -45,21 +45,23 @@ struct GPUBackend::Impl {
     const size_t bytes = n * sizeof(float);
     std::memcpy(h_x, x, bytes);
     cudaMemcpy(d_x, h_x, bytes, cudaMemcpyHostToDevice);
-    launch_sincosf_kernel(d_x, d_s, d_c, n);
+    launch_sinf_kernel(d_x, d_s, n);
     cudaMemcpy(h_s, d_s, bytes, cudaMemcpyDeviceToHost);
     std::memcpy(s, h_s, bytes);
   }
 
   void compute_cosf(size_t n, const float *x, float *c) const {
     const size_t bytes = n * sizeof(float);
+    std::memcpy(h_x, x, bytes);
     cudaMemcpy(d_x, h_x, bytes, cudaMemcpyHostToDevice);
-    launch_sincosf_kernel(d_x, d_s, d_c, n);
+    launch_cosf_kernel(d_x, d_c, n);
     cudaMemcpy(h_c, d_c, bytes, cudaMemcpyDeviceToHost);
     std::memcpy(c, h_c, bytes);
   }
 
   void compute_sincosf(size_t n, const float *x, float *s, float *c) const {
     const size_t bytes = n * sizeof(float);
+    std::memcpy(h_x, x, bytes);
     cudaMemcpy(d_x, h_x, bytes, cudaMemcpyHostToDevice);
     launch_sincosf_kernel(d_x, d_s, d_c, n);
     cudaMemcpy(h_s, d_s, bytes, cudaMemcpyDeviceToHost);
