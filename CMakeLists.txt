@@ -7,9 +7,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(TRIGDX_USE_MKL "Enable Intel MKL backend" OFF)
 option(TRIGDX_USE_GPU "Enable GPU backend" OFF)
 option(TRIGDX_USE_XSIMD "Enable XSIMD backend" OFF)
+option(TRIGDX_BUILD_TESTS "Build tests" ON)
+option(TRIGDX_BUILD_BENCHMARKS "Build tests" ON)
+
+if(TRIGDX_BUILD_TESTS OR TRIGDX_BUILD_BENCHMARKS)
+  include(FetchContent)
+endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
-add_subdirectory(tests)
-add_subdirectory(benchmarks)
+
+if(TRIGDX_BUILD_TESTS)
+  include(CTest)
+  enable_testing()
+  add_subdirectory(tests)
+endif()
+
+if(TRIGDX_BUILD_BENCHMARKS)
+  add_subdirectory(benchmarks)
+endif()
