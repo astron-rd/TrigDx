@@ -7,9 +7,6 @@
 
 #include <benchmark/benchmark.h>
 
-// Default values if not overridden by range multipliers
-constexpr size_t DEFAULT_N = 10'000'000;
-
 template <typename Backend>
 static void benchmark_sinf(benchmark::State &state) {
   const size_t N = static_cast<size_t>(state.range(0));
