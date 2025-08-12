@@ -1,3 +1,5 @@
+include(FetchContent)
+
 add_library(trigdx reference.cpp lookup.cpp lookup_avx.cpp)
 
 target_include_directories(trigdx PUBLIC ${PROJECT_SOURCE_DIR}/include)
@@ -20,7 +22,14 @@ if(TRIGDX_USE_GPU)
 endif()
 
 if(TRIGDX_USE_XSIMD)
-  find_package(xsimd REQUIRED)
+  find_package(xsimd QUIET)
+  if(NOT TARGET xsimd)
+    FetchContent_Declare(
+      xsimd
+      GIT_REPOSITORY https://github.com/xtensor-stack/xsimd.git
+      GIT_TAG 13.2.0)
+    FetchContent_MakeAvailable(xsimd)
+  endif()
   target_sources(trigdx PRIVATE lookup_xsimd.cpp)
   target_link_libraries(trigdx PRIVATE xsimd)
 endif()
