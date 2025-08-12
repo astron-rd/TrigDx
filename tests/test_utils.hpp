@@ -9,12 +9,15 @@
 
 const size_t N = 1e7;
 
+void init_x(std::vector<float> &x) {
+  for (size_t i = 0; i < x.size(); ++i) {
+    x[i] = (i % 360) * 0.0174533f; // degrees to radians
+  }
+}
+
 template <typename Backend> inline void test_sinf(float tol) {
   std::vector<float> x(N), s_ref(N), s(N);
-
-  for (size_t i = 0; i < N; ++i) {
-    x[i] = float(i) * 0.01f;
-  }
+  init_x(x);
 
   ReferenceBackend ref;
   Backend backend;
@@ -30,10 +33,7 @@ template <typename Backend> inline void test_sinf(float tol) {
 
 template <typename Backend> inline void test_cosf(float tol) {
   std::vector<float> x(N), c_ref(N), c(N);
-
-  for (size_t i = 0; i < N; ++i) {
-    x[i] = float(i) * 0.01f;
-  }
+  init_x(x);
 
   ReferenceBackend ref;
   Backend backend;
@@ -49,10 +49,7 @@ template <typename Backend> inline void test_cosf(float tol) {
 
 template <typename Backend> inline void test_sincosf(float tol) {
   std::vector<float> x(N), s_ref(N), c_ref(N), s(N), c(N);
-
-  for (size_t i = 0; i < N; ++i) {
-    x[i] = float(i) * 0.01f;
-  }
+  init_x(x);
 
   ReferenceBackend ref;
   Backend backend;
