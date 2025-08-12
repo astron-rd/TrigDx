@@ -1,5 +1,5 @@
 #pragma once
 
-#define TRIGDX_USE_MKL @TRIGDX_USE_MKL@
-#define TRIGDX_USE_GPU @TRIGDX_USE_GPU@
-#define TRIGDX_USE_XSIMD @TRIGDX_USE_XSIMD@
+#cmakedefine TRIGDX_USE_MKL
+#cmakedefine TRIGDX_USE_GPU
+#cmakedefine TRIGDX_USE_XSIMD
