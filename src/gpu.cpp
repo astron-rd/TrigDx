@@ -66,6 +66,8 @@ struct GPUBackend::Impl {
     launch_sincosf_kernel(d_x, d_s, d_c, n);
     cudaMemcpy(h_s, d_s, bytes, cudaMemcpyDeviceToHost);
     cudaMemcpy(h_c, d_c, bytes, cudaMemcpyDeviceToHost);
+    std::memcpy(s, h_s, bytes);
+    std::memcpy(c, h_c, bytes);
   }
 
   float *h_x = nullptr;
