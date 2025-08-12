@@ -2,8 +2,20 @@
 
 #include "benchmark_utils.hpp"
 
-int main() {
-  benchmark_sinf<ReferenceBackend>();
-  benchmark_cosf<ReferenceBackend>();
-  benchmark_sincosf<ReferenceBackend>();
-}
+BENCHMARK_TEMPLATE(benchmark_sinf, ReferenceBackend)
+    ->Unit(benchmark::kMillisecond)
+    ->Arg(1e5)
+    ->Arg(1e6)
+    ->Arg(1e7);
+BENCHMARK_TEMPLATE(benchmark_cosf, ReferenceBackend)
+    ->Unit(benchmark::kMillisecond)
+    ->Arg(1e5)
+    ->Arg(1e6)
+    ->Arg(1e7);
+BENCHMARK_TEMPLATE(benchmark_sincosf, ReferenceBackend)
+    ->Unit(benchmark::kMillisecond)
+    ->Arg(1e5)
+    ->Arg(1e6)
+    ->Arg(1e7);
+
+BENCHMARK_MAIN();

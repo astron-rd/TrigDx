@@ -1,76 +1,93 @@
 #pragma once
 
 #include <chrono>
-#include <iomanip>
-#include <iostream>
+#include <cmath>
+#include <string>
 #include <vector>
 
-const size_t N = 1e7;
+#include <benchmark/benchmark.h>
 
-inline void report(const std::string &name, double sec, double throughput) {
-  std::ios state(nullptr);
-  state.copyfmt(std::cout);
-  std::cout << std::setw(7) << name << " -> ";
-  std::cout << "time: ";
-  std::cout << std::fixed << std::setprecision(3) << std::setfill('0');
-  std::cout << sec << " s, ";
-  std::cout << "throughput: " << throughput << " M elems/sec\n";
-  std::cout.copyfmt(state);
-}
+// Default values if not overridden by range multipliers
+constexpr size_t DEFAULT_N = 10'000'000;
 
-template <typename Backend> inline void benchmark_sinf() {
+template <typename Backend>
+static void benchmark_sinf(benchmark::State &state) {
+  const size_t N = static_cast<size_t>(state.range(0));
   std::vector<float> x(N), s(N);
 
-  for (size_t i = 0; i < N; ++i)
+  for (size_t i = 0; i < N; ++i) {
     x[i] = (i % 360) * 0.0174533f; // degrees to radians
+  }
 
   Backend backend;
-  backend.init(N);
 
   auto start = std::chrono::high_resolution_clock::now();
-  backend.compute_sinf(N, x.data(), s.data());
+  backend.init(N);
   auto end = std::chrono::high_resolution_clock::now();
+  state.counters["init_ms"] =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+          .count() /
+      1.e3;
 
-  double sec = std::chrono::duration<double>(end - start).count();
-  double throughput = N / sec / 1e6;
+  for (auto _ : state) {
+    backend.compute_sinf(N, x.data(), s.data());
+    benchmark::DoNotOptimize(s);
+  }
 
-  report("sinf", sec, throughput);
+  state.SetItemsProcessed(int64_t(state.iterations()) * int64_t(N));
 }
 
-template <typename Backend> inline void benchmark_cosf() {
+template <typename Backend>
+static void benchmark_cosf(benchmark::State &state) {
+  const size_t N = static_cast<size_t>(state.range(0));
   std::vector<float> x(N), c(N);
 
-  for (size_t i = 0; i < N; ++i)
-    x[i] = (i % 360) * 0.0174533f; // degrees to radians
+  for (size_t i = 0; i < N; ++i) {
+    x[i] = (i % 360) * 0.0174533f;
+  }
 
   Backend backend;
-  backend.init(N);
 
   auto start = std::chrono::high_resolution_clock::now();
-  backend.compute_cosf(N, x.data(), c.data());
+  backend.init(N);
   auto end = std::chrono::high_resolution_clock::now();
+  state.counters["init_ms"] =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+          .count() /
+      1.e3;
 
-  double sec = std::chrono::duration<double>(end - start).count();
-  double throughput = N / sec / 1e6;
+  for (auto _ : state) {
+    backend.compute_cosf(N, x.data(), c.data());
+    benchmark::DoNotOptimize(c);
+  }
 
-  report("cosf", sec, throughput);
+  state.SetItemsProcessed(int64_t(state.iterations()) * int64_t(N));
 }
 
-template <typename Backend> inline void benchmark_sincosf() {
+template <typename Backend>
+static void benchmark_sincosf(benchmark::State &state) {
+  const size_t N = static_cast<size_t>(state.range(0));
   std::vector<float> x(N), s(N), c(N);
 
-  for (size_t i = 0; i < N; ++i)
-    x[i] = (i % 360) * 0.0174533f; // degrees to radians
+  for (size_t i = 0; i < N; ++i) {
+    x[i] = (i % 360) * 0.0174533f;
+  }
 
   Backend backend;
-  backend.init(N);
 
   auto start = std::chrono::high_resolution_clock::now();
-  backend.compute_sincosf(N, x.data(), s.data(), c.data());
+  backend.init(N);
   auto end = std::chrono::high_resolution_clock::now();
+  state.counters["init_ms"] =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+          .count() /
+      1.e3;
 
-  double sec = std::chrono::duration<double>(end - start).count();
-  double throughput = N / sec / 1e6;
+  for (auto _ : state) {
+    backend.compute_sincosf(N, x.data(), s.data(), c.data());
+    benchmark::DoNotOptimize(s);
+    benchmark::DoNotOptimize(c);
+  }
 
-  report("sincosf", sec, throughput);
+  state.SetItemsProcessed(int64_t(state.iterations()) * int64_t(N));
 }
