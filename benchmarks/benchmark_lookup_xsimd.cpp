@@ -1,4 +1,4 @@
-#include <trigdx/lookup_xsimd.hpp>
+#include <trigdx/trigdx.hpp>
 
 #include "benchmark_utils.hpp"
 
