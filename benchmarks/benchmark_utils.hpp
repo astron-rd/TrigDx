@@ -34,7 +34,8 @@ static void benchmark_sinf(benchmark::State &state) {
     benchmark::DoNotOptimize(s);
   }
 
-  state.SetItemsProcessed(int64_t(state.iterations()) * int64_t(N));
+  state.SetItemsProcessed(static_cast<int64_t>(state.iterations()) *
+                          static_cast<int64_t>(N));
 }
 
 template <typename Backend>
@@ -61,7 +62,8 @@ static void benchmark_cosf(benchmark::State &state) {
     benchmark::DoNotOptimize(c);
   }
 
-  state.SetItemsProcessed(int64_t(state.iterations()) * int64_t(N));
+  state.SetItemsProcessed(static_cast<int64_t>(state.iterations()) *
+                          static_cast<int64_t>(N));
 }
 
 template <typename Backend>
@@ -89,5 +91,6 @@ static void benchmark_sincosf(benchmark::State &state) {
     benchmark::DoNotOptimize(c);
   }
 
-  state.SetItemsProcessed(int64_t(state.iterations()) * int64_t(N));
+  state.SetItemsProcessed(static_cast<int64_t>(state.iterations()) *
+                          static_cast<int64_t>(N));
 }
