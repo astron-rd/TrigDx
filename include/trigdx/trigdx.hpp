@@ -6,14 +6,14 @@
 #include <trigdx/lookup.hpp>
 #include <trigdx/lookup_avx.hpp>
 
-#if TRIGDX_USE_MKL
+#if defined(TRIGDX_USE_MKL)
 #include <trigdx/mkl.hpp>
 #endif
 
-#if TRIGDX_USE_GPU
+#if defined(TRIGDX_USE_GPU)
 #include <trigdx/gpu.hpp>
 #endif
 
-#if TRIGDX_USE_XSIMD
+#if defined(TRIGDX_USE_XSIMD)
 #include <trigdx/lookup_xsimd.hpp>
 #endif
