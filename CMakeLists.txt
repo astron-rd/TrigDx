@@ -4,9 +4,9 @@ project(trigdx LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(USE_MKL "Enable Intel MKL backend" OFF)
-option(USE_GPU "Enable GPU backend" OFF)
-option(USE_XSIMD "Enable XSIMD backend" OFF)
+option(TRIGDX_USE_MKL "Enable Intel MKL backend" OFF)
+option(TRIGDX_USE_GPU "Enable GPU backend" OFF)
+option(TRIGDX_USE_XSIMD "Enable XSIMD backend" OFF)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
