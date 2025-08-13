@@ -35,5 +35,5 @@ if(TRIGDX_USE_XSIMD)
 endif()
 
 target_include_directories(
-  trigdx INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)
+  trigdx INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+                   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
