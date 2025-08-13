@@ -22,7 +22,7 @@ if(TRIGDX_USE_GPU)
 endif()
 
 if(TRIGDX_USE_XSIMD)
-  find_package(xsimd QUIET)
+  find_package(xsimd 13.0.0 QUIET VERSION)
   if(NOT TARGET xsimd)
     FetchContent_Declare(
       xsimd
