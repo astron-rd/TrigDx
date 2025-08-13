@@ -2,9 +2,9 @@
 
 #include <trigdx/trigdx_config.hpp>
 
-#include <trigdx/reference.hpp>
 #include <trigdx/lookup.hpp>
 #include <trigdx/lookup_avx.hpp>
+#include <trigdx/reference.hpp>
 
 #if defined(TRIGDX_USE_MKL)
 #include <trigdx/mkl.hpp>
