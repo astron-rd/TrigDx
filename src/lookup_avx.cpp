@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
-
+#if defined(__AVX__)
 #include <immintrin.h>
-
+#endif
 #include "trigdx/lookup_avx.hpp"
 
 template <std::size_t NR_SAMPLES> struct LookupAVXBackend<NR_SAMPLES>::Impl {
@@ -160,7 +160,7 @@ template <std::size_t NR_SAMPLES> struct LookupAVXBackend<NR_SAMPLES>::Impl {
     for (std::size_t i = 0; i < n; ++i) {
       std::size_t idx = static_cast<std::size_t>(x[i] * SCALE) & MASK;
       std::size_t idx_cos = (idx + NR_SAMPLES / 4) & MASK;
-      s[i] = lookup[idx];
+
       c[i] = lookup[idx_cos];
     }
 #endif
