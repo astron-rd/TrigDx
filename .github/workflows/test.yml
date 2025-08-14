@@ -1,0 +1,76 @@
+name: test
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: [slurm]
+    strategy:
+      matrix: &gpu-matrix
+        include:
+          - name: NVIDIA A4000
+            partition: defq
+            gres: gpu:A4000
+            cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
+    env:
+      DEVICE_NAME: ${{ matrix.name }}
+      PARTITION_NAME: ${{ matrix.partition }}
+      CMAKE_FLAGS: ${{ matrix.cmake_flags }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astron-rd/slurm-action@v1
+        with:
+          partition: ${{ matrix.partition }}
+          gres: ${{ matrix.gres }}
+          commands: |
+            if [[ "$PARTITION_NAME" == defq ]]; then
+              source /etc/profile.d/modules.sh
+              module load spack/20250403
+              module load cuda intel-oneapi-mkl
+              source /etc/profile
+            fi
+            cmake -S . -B build ${CMAKE_FLAGS}
+            make -C build -j
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.name }}
+          path: build
+
+  test:
+    runs-on: [slurm]
+    needs: build
+    strategy:
+      matrix: *gpu-matrix
+    env:
+      DEVICE_NAME: ${{ matrix.name }}
+      PARTITION_NAME: ${{ matrix.partition }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-${{ matrix.name }}
+      - uses: astron-rd/slurm-action@v1
+        with:
+          partition: ${{ matrix.partition }}
+          gres: ${{ matrix.gres }}
+          commands: |
+            ctest --test-dir build --output-on-failure
+
+  benchmark:
+    runs-on: [slurm]
+    needs: build
+    strategy:
+      matrix: *gpu-matrix
+    env:
+      DEVICE_NAME: ${{ matrix.name }}
+      PARTITION_NAME: ${{ matrix.partition }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-${{ matrix.name }}
+      - uses: astron-rd/slurm-action@v1
+        with:
+          partition: ${{ matrix.partition }}
+          gres: ${{ matrix.gres }}
+          commands: |
+            find build/benchmarks -type f -executable -exec {} \;
