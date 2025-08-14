@@ -23,7 +23,6 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            BUILD_DIR=$(mktemp -d -t build-XXXXXXXX)
             if [[ "$PARTITION_NAME" == defq ]]; then
               source /etc/profile.d/modules.sh
               module load spack/20250403
@@ -33,14 +32,13 @@ jobs:
             if [[ "$PARTITION_NAME" == defq ]]; then
               source /etc/profile
             fi
-            cmake -S . -B ${BUILD_DIR} ${CMAKE_FLAGS}
-            make -C ${BUILD_DIR} -j
-            tar czf "build-${{ matrix.name }}".tar.gz -C "${BUILD_DIR}"
+            cmake -S . -B build ${CMAKE_FLAGS}
+            make -C build -j
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.name }}
-          path: build.tar.gz
+          path: build
 
   test:
     runs-on: [slurm]
@@ -63,9 +61,7 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            BUILD_DIR=$(mktemp -d -t build-XXXXXXXX)
-            tar xzf "build-${{ matrix.name }}".tar.gz -C "${BUILD_DIR}"
-            ctest --test-dir ${BUILD_DIR} --output-on-failure
+            ctest --test-dir build --output-on-failure
 
   benchmark:
     runs-on: [slurm]
@@ -88,6 +84,4 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            BUILD_DIR=$(mktemp -d -t build-XXXXXXXX)
-            tar xzf "build-${{ matrix.name }}".tar.gz -C "${BUILD_DIR}"
-            find ${BUILD_DIR}/benchmarks -type f -executable -exec {} \;
+            find build/benchmarks -type f -executable -exec {} \;
