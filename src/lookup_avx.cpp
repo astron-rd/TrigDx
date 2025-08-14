@@ -1,9 +1,8 @@
 #include <algorithm>
 #include <cmath>
-#include <vector>
-#if defined(__AVX__)
 #include <immintrin.h>
-#endif
+#include <vector>
+
 #include "trigdx/lookup_avx.hpp"
 
 template <std::size_t NR_SAMPLES> struct LookupAVXBackend<NR_SAMPLES>::Impl {
