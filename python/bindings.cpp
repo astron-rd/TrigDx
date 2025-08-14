@@ -11,6 +11,10 @@ py::array_t<T>
 compute_sin(const Backend &backend,
             py::array_t<T, py::array::c_style | py::array::forcecast> x) {
   ssize_t n = x.shape(0);
+  if (x.ndim() != 1) {
+    throw py::value_error("Input array must be 1-dimensional");
+  }
+
   const T *x_ptr = x.data();
 
   py::array_t<float> s(n);
@@ -26,6 +30,10 @@ py::array_t<T>
 compute_cos(const Backend &backend,
             py::array_t<T, py::array::c_style | py::array::forcecast> x) {
   ssize_t n = x.shape(0);
+  if (x.ndim() != 1) {
+    throw py::value_error("Input array must be 1-dimensional");
+  }
+
   const T *x_ptr = x.data();
 
   py::array_t<T> c(n);
@@ -41,6 +49,10 @@ std::tuple<py::array_t<T>, py::array_t<T>>
 compute_sincos(const Backend &backend,
                py::array_t<T, py::array::c_style | py::array::forcecast> x) {
   ssize_t n = x.shape(0);
+  if (x.ndim() != 1) {
+    throw py::value_error("Input array must be 1-dimensional");
+  }
+
   const T *x_ptr = x.data();
 
   py::array_t<T> s(n);
