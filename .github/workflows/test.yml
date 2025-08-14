@@ -26,8 +26,7 @@ jobs:
             if [[ "$PARTITION_NAME" == defq ]]; then
               source /etc/profile.d/modules.sh
               module load spack/20250403
-              module load cuda
-              module load intel-oneapi-mkl
+              module load cuda intel-oneapi-mkl
               source /etc/profile
             fi
             cmake -S . -B build ${CMAKE_FLAGS}
