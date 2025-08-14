@@ -10,7 +10,7 @@ template <typename T>
 py::array_t<T>
 compute_sin(const Backend &backend,
             py::array_t<T, py::array::c_style | py::array::forcecast> x) {
-  ssize_t n = x.shape(0);
+  const size_t n = x.shape(0);
   if (x.ndim() != 1) {
     throw py::value_error("Input array must be 1-dimensional");
   }
@@ -20,7 +20,7 @@ compute_sin(const Backend &backend,
   py::array_t<float> s(n);
   T *s_ptr = s.mutable_data();
 
-  backend.compute_sinf(static_cast<size_t>(n), x_ptr, s_ptr);
+  backend.compute_sinf(n, x_ptr, s_ptr);
 
   return s;
 }
@@ -29,7 +29,7 @@ template <typename T>
 py::array_t<T>
 compute_cos(const Backend &backend,
             py::array_t<T, py::array::c_style | py::array::forcecast> x) {
-  ssize_t n = x.shape(0);
+  const size_t n = x.shape(0);
   if (x.ndim() != 1) {
     throw py::value_error("Input array must be 1-dimensional");
   }
@@ -39,7 +39,7 @@ compute_cos(const Backend &backend,
   py::array_t<T> c(n);
   T *c_ptr = c.mutable_data();
 
-  backend.compute_cosf(static_cast<size_t>(n), x_ptr, c_ptr);
+  backend.compute_cosf(n, x_ptr, c_ptr);
 
   return c;
 }
@@ -48,7 +48,7 @@ template <typename T>
 std::tuple<py::array_t<T>, py::array_t<T>>
 compute_sincos(const Backend &backend,
                py::array_t<T, py::array::c_style | py::array::forcecast> x) {
-  ssize_t n = x.shape(0);
+  const size_t n = x.shape(0);
   if (x.ndim() != 1) {
     throw py::value_error("Input array must be 1-dimensional");
   }
@@ -58,8 +58,7 @@ compute_sincos(const Backend &backend,
   py::array_t<T> s(n);
   py::array_t<T> c(n);
 
-  backend.compute_sincosf(static_cast<size_t>(n), x_ptr, s.mutable_data(),
-                          c.mutable_data());
+  backend.compute_sincosf(n, x_ptr, s.mutable_data(), c.mutable_data());
 
   return std::make_tuple(s, c);
 }
