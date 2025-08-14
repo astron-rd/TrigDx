@@ -12,10 +12,6 @@ jobs:
             partition: defq
             gres: gpu:A4000
             cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
-          - name: NVIDIA GH200
-            partition: ghq
-            gres: gpu:GH200
-            cmake_flags: "-DTRIGDX_USE_GPU=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=90a -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc"
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
@@ -55,9 +51,6 @@ jobs:
           - name: NVIDIA A4000
             partition: defq
             gres: gpu:A4000
-          - name: NVIDIA GH200
-            partition: ghq
-            gres: gpu:GH200
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
@@ -83,9 +76,6 @@ jobs:
           - name: NVIDIA A4000
             partition: defq
             gres: gpu:A4000
-          - name: NVIDIA GH200
-            partition: ghq
-            gres: gpu:GH200
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
