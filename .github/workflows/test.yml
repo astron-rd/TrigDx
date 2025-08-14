@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: [slurm]
     strategy:
-      matrix:
+      matrix: &gpu-matrix
         include:
           - name: NVIDIA A4000
             partition: defq
@@ -41,11 +41,7 @@ jobs:
     runs-on: [slurm]
     needs: build
     strategy:
-      matrix:
-        include:
-          - name: NVIDIA A4000
-            partition: defq
-            gres: gpu:A4000
+      matrix: *gpu-matrix
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
@@ -64,11 +60,7 @@ jobs:
     runs-on: [slurm]
     needs: build
     strategy:
-      matrix:
-        include:
-          - name: NVIDIA A4000
-            partition: defq
-            gres: gpu:A4000
+      matrix: *gpu-matrix
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
