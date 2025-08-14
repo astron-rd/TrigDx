@@ -1,6 +1,12 @@
 include(CheckCXXSourceRuns)
 
-set(CMAKE_REQUIRED_FLAGS "-mavx") # for GCC/Clang; use /arch:AVX for MSVC
+set(SUPPORTED_COMPILERS Clang;GNU;Intel)
+
+if(CMAKE_CXX_COMPILER_ID IN_LIST SUPPORTED_COMPILERS)
+  set(CMAKE_REQUIRED_FLAGS "-mavx") # for GCC/Clang; use /arch:AVX for MSVC
+else()
+  message(FATAL_ERROR "Compiler : " ${CMAKE_CXX_COMPILER_ID} " not supported")
+endif()
 
 check_cxx_source_runs(
   "
@@ -13,4 +19,8 @@ int main() {
 }"
   HAVE_AVX)
 
-message(STATUS "AVX support: " ${HAVE_AVX})
+if(HAVE_AVX)
+  message(STATUS "AVX support: true")
+else()
+  message(STATUS "AVX support: false")
+endif()
