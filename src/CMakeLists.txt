@@ -26,6 +26,7 @@ if(TRIGDX_USE_GPU)
 endif()
 
 if(TRIGDX_USE_XSIMD)
+  # Requires XSIMD > 13 for architecture independent dispatching
   find_package(xsimd 13 QUIET)
   if(NOT TARGET xsimd)
     FetchContent_Declare(
