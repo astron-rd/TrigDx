@@ -13,8 +13,4 @@ int main() {
 }"
   HAVE_AVX)
 
-if(HAVE_AVX)
-  message(STATUS "AVX instruction set is supported")
-else()
-  message(STATUS "No AVX support found.")
-endif()
+message(STATUS "AVX support: " ${HAVE_AVX})
