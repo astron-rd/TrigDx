@@ -1,8 +1,9 @@
 name: test
 on:
   push:
+
 jobs:
-  test-gpu:
+  build:
     runs-on: [slurm]
     strategy:
       matrix:
@@ -25,7 +26,6 @@ jobs:
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
-          time: "00:10:00"
           commands: |
             BUILD_DIR=$(mktemp -d -t build-XXXXXXXX)
             if [[ "$PARTITION_NAME" == defq ]]; then
@@ -39,5 +39,65 @@ jobs:
             fi
             cmake -S . -B ${BUILD_DIR} ${CMAKE_FLAGS}
             make -C ${BUILD_DIR} -j
+            tar czf "build-${{ matrix.name }}".tar.gz -C "${BUILD_DIR}"
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.name }}
+          path: build.tar.gz
+
+  test:
+    runs-on: [slurm]
+    needs: build
+    strategy:
+      matrix:
+        include:
+          - name: NVIDIA A4000
+            partition: defq
+            gres: gpu:A4000
+          - name: NVIDIA GH200
+            partition: ghq
+            gres: gpu:GH200
+    env:
+      DEVICE_NAME: ${{ matrix.name }}
+      PARTITION_NAME: ${{ matrix.partition }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-${{ matrix.name }}
+      - uses: astron-rd/slurm-action@v1
+        with:
+          partition: ${{ matrix.partition }}
+          gres: ${{ matrix.gres }}
+          commands: |
+            BUILD_DIR=$(mktemp -d -t build-XXXXXXXX)
+            tar xzf "build-${{ matrix.name }}".tar.gz -C "${BUILD_DIR}"
             ctest --test-dir ${BUILD_DIR} --output-on-failure
+
+  benchmark:
+    runs-on: [slurm]
+    needs: build
+    strategy:
+      matrix:
+        include:
+          - name: NVIDIA A4000
+            partition: defq
+            gres: gpu:A4000
+          - name: NVIDIA GH200
+            partition: ghq
+            gres: gpu:GH200
+    env:
+      DEVICE_NAME: ${{ matrix.name }}
+      PARTITION_NAME: ${{ matrix.partition }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-${{ matrix.name }}
+      - uses: astron-rd/slurm-action@v1
+        with:
+          partition: ${{ matrix.partition }}
+          gres: ${{ matrix.gres }}
+          commands: |
+            BUILD_DIR=$(mktemp -d -t build-XXXXXXXX)
+            tar xzf "build-${{ matrix.name }}".tar.gz -C "${BUILD_DIR}"
             find ${BUILD_DIR}/benchmarks -type f -executable -exec {} \;
