@@ -6,16 +6,16 @@ jobs:
   build:
     runs-on: [slurm]
     strategy:
-      matrix: &gpu-matrix
+      matrix: &matrix
         include:
-          - name: NVIDIA A4000
+          - name: GNU, NVIDIA A4000
             partition: defq
             gres: gpu:A4000
-            cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
-    env:
-      DEVICE_NAME: ${{ matrix.name }}
+            cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_MKL=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
+            environment_modules: "spack/20250403 intel-oneapi-mkl cuda python"
       PARTITION_NAME: ${{ matrix.partition }}
       CMAKE_FLAGS: ${{ matrix.cmake_flags }}
+      ENVIRONMENT_MODULES: ${{ matrix.environment_modules }}
     steps:
       - uses: actions/checkout@v4
       - uses: astron-rd/slurm-action@v1
@@ -23,12 +23,7 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            if [[ "$PARTITION_NAME" == defq ]]; then
-              source /etc/profile.d/modules.sh
-              module load spack/20250403
-              module load cuda intel-oneapi-mkl
-              source /etc/profile
-            fi
+            module load ${ENVIRONMENT_MODULES}
             cmake -S . -B build ${CMAKE_FLAGS}
             make -C build -j
       - name: Upload build
@@ -41,7 +36,7 @@ jobs:
     runs-on: [slurm]
     needs: build
     strategy:
-      matrix: *gpu-matrix
+      matrix: *matrix
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
@@ -60,7 +55,7 @@ jobs:
     runs-on: [slurm]
     needs: build
     strategy:
-      matrix: *gpu-matrix
+      matrix: *matrix
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
