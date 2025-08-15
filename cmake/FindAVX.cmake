@@ -26,9 +26,10 @@ int main() {
 "
   HAVE_AVX)
 
-# AVX2 check
-check_cxx_source_runs(
-  "
+if(HAVE_AVX)
+  # AVX2 check
+  check_cxx_source_runs(
+    "
 #include <immintrin.h>
 int main() {
     __m256i a = _mm256_set1_epi32(-1);
@@ -37,4 +38,5 @@ int main() {
     return 0;
 }
 "
-  HAVE_AVX2)
+    HAVE_AVX2)
+endif()
