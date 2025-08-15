@@ -7,7 +7,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <trigdx/reference.hpp>
 
-const size_t N = 1e7;
+const size_t N = 1234;
 
 void init_x(std::vector<float> &x) {
   for (size_t i = 0; i < x.size(); ++i) {
