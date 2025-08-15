@@ -12,7 +12,7 @@ option(TRIGDX_BUILD_TESTS "Build tests" ON)
 option(TRIGDX_BUILD_BENCHMARKS "Build tests" ON)
 option(TRIGDX_BUILD_PYTHON "Build Python interface" ON)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/trigdx_config.hpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/trigdx/trigdx_config.hpp @ONLY)
