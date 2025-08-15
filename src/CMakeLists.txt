@@ -4,8 +4,6 @@ add_library(trigdx reference.cpp lookup.cpp)
 
 target_include_directories(trigdx PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-target_compile_options(trigdx PRIVATE -O3 -march=native)
-
 if(HAVE_AVX)
   target_sources(trigdx PRIVATE lookup_avx.cpp)
 endif()
