@@ -8,12 +8,20 @@
 template <std::size_t NR_SAMPLES> struct lookup_table {
   static constexpr std::size_t MASK = NR_SAMPLES - 1;
   static constexpr float SCALE = NR_SAMPLES / (2.0f * float(M_PI));
-  lookup_table() : values{} {
+  static constexpr float PI_FRAC = 2.0f * M_PIf32 / NR_SAMPLES;
+  static constexpr float TERM1 = 1.0f;         // 1
+  static constexpr float TERM2 = 0.5f;         // 1/2!
+  static constexpr float TERM3 = 1.0f / 6.0f;  // 1/3!
+  static constexpr float TERM4 = 1.0f / 24.0f; // 1/4!
+
+  constexpr lookup_table() : sin_values{}, cos_values{} {
     for (uint_fast32_t i = 0; i < NR_SAMPLES; i++) {
-      values[i] = sinf(i * (2.0f * float(M_PI) / NR_SAMPLES));
+      sin_values[i] = sinf(i * PI_FRAC);
+      cos_values[i] = cosf(i * PI_FRAC);
     }
   }
-  std::array<float, NR_SAMPLES> values;
+  std::array<float, NR_SAMPLES> cos_values;
+  std::array<float, NR_SAMPLES> sin_values;
 };
 
 template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
@@ -27,26 +35,55 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
     const uint_fast32_t VS = n - n % VL;
     const uint_fast32_t Q_PI = NR_SAMPLES / 4U;
     const b_type scale = b_type::broadcast(lookup_table_.SCALE);
+    const b_type pi_frac = b_type::broadcast(lookup_table_.PI_FRAC);
     const m_type mask = m_type::broadcast(lookup_table_.MASK);
 
+    const b_type term1 = b_type::broadcast(lookup_table_.TERM1); // 1
+    const b_type term2 = b_type::broadcast(lookup_table_.TERM2); // 1/2!
+    const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
+    const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
     const m_type quarter_pi = m_type::broadcast(Q_PI);
     uint_fast32_t i;
     for (i = 0; i < VS; i += VL) {
       const b_type vx = b_type::load(a + i, Tag());
       const b_type scaled = xsimd::mul(vx, scale);
       m_type idx = xsimd::to_int(scaled);
-      m_type idx_cos = xsimd::add(idx, quarter_pi);
-      idx_cos = xsimd::bitwise_and(idx_cos, mask);
-      const b_type cosv = b_type::gather(lookup_table_.values.data(), idx_cos);
+      const b_type f_idx = xsimd::to_float(idx);
+      idx = xsimd::bitwise_and(idx, mask);
+
+      b_type cosv = b_type::gather(lookup_table_.cos_values.data(), idx);
+      b_type sinv = b_type::gather(lookup_table_.sin_values.data(), idx);
+
+      const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
+      const b_type dx2 = xsimd::mul(dx, dx);
+      const b_type dx3 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type t2 = xsimd::mul(dx2, term2);
+      const b_type t3 = xsimd::mul(dx3, term3);
+      const b_type t4 = xsimd::mul(dx4, term3);
+
+      const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
+
+      const b_type sindx = xsimd::sub(dx, t3);
+
+      cosv = xsimd::sub(xsimd::mul(cosv, cosdx), xsimd::mul(sinv, sindx));
 
       cosv.store(c + i, Tag());
     }
     for (; i < n; i++) {
-      std::size_t idx = static_cast<std::size_t>(a[i] * lookup_table_.SCALE) &
-                        lookup_table_.MASK;
-      std::size_t idx_cos = (idx + Q_PI) & lookup_table_.MASK;
+      std::size_t idx = static_cast<std::size_t>(a[i] * lookup_table_.SCALE);
 
-      c[i] = lookup_table_.values[idx_cos];
+      std::size_t masked = idx & lookup_table_.MASK;
+      const float cosv = lookup_table_.cos_values[masked];
+      const float sinv = lookup_table_.sin_values[masked];
+      const float dx = a[i] - idx * lookup_table_.PI_FRAC;
+      const float dx2 = dx * dx;
+      const float dx3 = dx2 * dx;
+      const float dx4 = dx3 * dx;
+      const float cosdx =
+          1.0f - lookup_table_.TERM2 * dx2 + lookup_table_.TERM4 * dx4;
+      const float sindx = dx - lookup_table_.TERM3 * dx3;
+      c[i] = cosv * cosdx - sinv * sindx;
     }
   }
   lookup_table<NR_SAMPLES> lookup_table_;
@@ -63,23 +100,52 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
     const uint_fast32_t VS = n - n % VL;
     const uint_fast32_t Q_PI = NR_SAMPLES / 4U;
     const b_type scale = b_type::broadcast(lookup_table_.SCALE);
+    const b_type pi_frac = b_type::broadcast(lookup_table_.PI_FRAC);
     const m_type mask = m_type::broadcast(lookup_table_.MASK);
 
+    const b_type term1 = b_type::broadcast(lookup_table_.TERM1); // 1
+    const b_type term2 = b_type::broadcast(lookup_table_.TERM2); // 1/2!
+    const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
+    const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
     const m_type quarter_pi = m_type::broadcast(Q_PI);
     uint_fast32_t i;
     for (i = 0; i < VS; i += VL) {
       const b_type vx = b_type::load(a + i, Tag());
       const b_type scaled = xsimd::mul(vx, scale);
       m_type idx = xsimd::to_int(scaled);
-      idx = xsimd::bitwise_and(idx, mask);
-      const b_type sinv = b_type::gather(lookup_table_.values.data(), idx);
+      b_type f_idx = xsimd::to_float(idx);
+      const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
+      const b_type dx2 = xsimd::mul(dx, dx);
+      const b_type dx3 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type t2 = xsimd::mul(dx2, term2);
+      const b_type t3 = xsimd::mul(dx3, term3);
+      const b_type t4 = xsimd::mul(dx4, term3);
 
+      const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
+      const b_type sindx = xsimd::sub(dx, t3);
+
+      idx = xsimd::bitwise_and(idx, mask);
+      b_type sinv = b_type::gather(lookup_table_.sin_values.data(), idx);
+      const b_type cosv = b_type::gather(lookup_table_.cos_values.data(), idx);
+
+      sinv = xsimd::add(xsimd::mul(cosv, sindx), xsimd::mul(sinv, cosdx));
       sinv.store(s + i, Tag());
     }
     for (; i < n; i++) {
-      std::size_t idx = static_cast<std::size_t>(a[i] * lookup_table_.SCALE) &
-                        lookup_table_.MASK;
-      s[i] = lookup_table_.values[idx];
+      std::size_t idx = static_cast<std::size_t>(a[i] * lookup_table_.SCALE);
+      std::size_t masked = idx & lookup_table_.MASK;
+      const float cosv = lookup_table_.cos_values[masked];
+      const float sinv = lookup_table_.sin_values[masked];
+      const float dx = a[i] - idx * lookup_table_.PI_FRAC;
+      const float dx2 = dx * dx;
+      const float dx3 = dx2 * dx;
+      const float dx4 = dx3 * dx;
+      const float cosdx =
+          1.0f - lookup_table_.TERM2 * dx2 + lookup_table_.TERM4 * dx4;
+      const float sindx = dx - lookup_table_.TERM3 * dx3;
+
+      s[i] = sinv * cosdx + cosv * sindx;
     }
   }
   lookup_table<NR_SAMPLES> lookup_table_;
@@ -97,6 +163,12 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
     const uint_fast32_t Q_PI = NR_SAMPLES / 4U;
     const b_type scale = b_type::broadcast(lookup_table_.SCALE);
     const m_type mask = m_type::broadcast(lookup_table_.MASK);
+    const b_type pi_frac = b_type::broadcast(lookup_table_.PI_FRAC);
+
+    const b_type term1 = b_type::broadcast(lookup_table_.TERM1); // 1
+    const b_type term2 = b_type::broadcast(lookup_table_.TERM2); // 1/2!
+    const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
+    const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
 
     const m_type quarter_pi = m_type::broadcast(Q_PI);
     uint_fast32_t i;
@@ -104,21 +176,42 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
       const b_type vx = b_type::load(a + i, Tag());
       const b_type scaled = xsimd::mul(vx, scale);
       m_type idx = xsimd::to_int(scaled);
-      m_type idx_cos = xsimd::add(idx, quarter_pi);
+      b_type f_idx = xsimd::to_float(idx);
+      const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
+      const b_type dx2 = xsimd::mul(dx, dx);
+      const b_type dx3 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type t2 = xsimd::mul(dx2, term2);
+      const b_type t3 = xsimd::mul(dx3, term3);
+      const b_type t4 = xsimd::mul(dx4, term3);
+
       idx = xsimd::bitwise_and(idx, mask);
-      idx_cos = xsimd::bitwise_and(idx_cos, mask);
-      const b_type sinv = b_type::gather(lookup_table_.values.data(), idx);
-      const b_type cosv = b_type::gather(lookup_table_.values.data(), idx_cos);
+      b_type sinv = b_type::gather(lookup_table_.sin_values.data(), idx);
+      b_type cosv = b_type::gather(lookup_table_.cos_values.data(), idx);
+
+      const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
+      const b_type sindx = xsimd::sub(dx, t3);
+
+      sinv = xsimd::add(xsimd::mul(cosv, sindx), xsimd::mul(sinv, cosdx));
+      cosv = xsimd::sub(xsimd::mul(cosv, cosdx), xsimd::mul(sinv, sindx));
 
       sinv.store(s + i, Tag());
       cosv.store(c + i, Tag());
     }
     for (; i < n; i++) {
-      std::size_t idx = static_cast<std::size_t>(a[i] * lookup_table_.SCALE) &
-                        lookup_table_.MASK;
-      std::size_t idx_cos = (idx + Q_PI) & lookup_table_.MASK;
-      s[i] = lookup_table_.values[idx];
-      c[i] = lookup_table_.values[idx_cos];
+      std::size_t idx = static_cast<std::size_t>(a[i] * lookup_table_.SCALE);
+      std::size_t masked = idx & lookup_table_.MASK;
+      const float cosv = lookup_table_.cos_values[masked];
+      const float sinv = lookup_table_.sin_values[masked];
+      const float dx = a[i] - idx * lookup_table_.PI_FRAC;
+      const float dx2 = dx * dx;
+      const float dx3 = dx2 * dx;
+      const float dx4 = dx3 * dx;
+      const float cosdx =
+          1.0f - lookup_table_.TERM2 * dx2 + lookup_table_.TERM4 * dx4;
+      const float sindx = dx - lookup_table_.TERM3 * dx3;
+      s[i] = sinv * cosdx + cosv * sindx;
+      c[i] = cosv * cosdx - sinv * sindx;
     }
   }
   lookup_table<NR_SAMPLES> lookup_table_;
