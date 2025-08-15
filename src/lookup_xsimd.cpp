@@ -14,7 +14,7 @@ template <std::size_t NR_SAMPLES> struct lookup_table {
   static constexpr float TERM3 = 1.0f / 6.0f;  // 1/3!
   static constexpr float TERM4 = 1.0f / 24.0f; // 1/4!
 
-constexpr lookup_table() : sin_values{}, cos_values{} {
+  constexpr lookup_table() : sin_values{}, cos_values{} {
     for (uint_fast32_t i = 0; i < NR_SAMPLES; i++) {
       sin_values[i] = sinf(i * PI_FRAC);
       cos_values[i] = cosf(i * PI_FRAC);
