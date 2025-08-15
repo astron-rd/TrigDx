@@ -13,19 +13,12 @@ jobs:
             gres: gpu:A4000
             cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_MKL=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
             environment_modules: "spack/20250403 intel-oneapi-mkl cuda python"
-          - name: Intel, NVIDIA A4000
-            partition: defq
-            gres: gpu:A4000
-            cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_MKL=1-DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
-            environment_modules: "spack/20250403 intel-oneapi-compilers intel-oneapi-mkl cuda python"
-    env:
-      DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
       CMAKE_FLAGS: ${{ matrix.cmake_flags }}
       ENVIRONMENT_MODULES: ${{ matrix.environment_modules }}
     steps:
       - uses: actions/checkout@v4
-      - uses: astron-rd/slurm-action@v1.1
+      - uses: astron-rd/slurm-action@v1
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
@@ -51,7 +44,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
-      - uses: astron-rd/slurm-action@v1.1
+      - uses: astron-rd/slurm-action@v1
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
@@ -70,7 +63,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
-      - uses: astron-rd/slurm-action@v1.1
+      - uses: astron-rd/slurm-action@v1
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
