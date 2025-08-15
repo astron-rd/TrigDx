@@ -13,8 +13,11 @@ target_link_libraries(benchmark_reference PRIVATE trigdx benchmark::benchmark)
 add_executable(benchmark_lookup benchmark_lookup.cpp)
 target_link_libraries(benchmark_lookup PRIVATE trigdx benchmark::benchmark)
 
-add_executable(benchmark_lookup_avx benchmark_lookup_avx.cpp)
-target_link_libraries(benchmark_lookup_avx PRIVATE trigdx benchmark::benchmark)
+if(HAVE_AVX)
+  add_executable(benchmark_lookup_avx benchmark_lookup_avx.cpp)
+  target_link_libraries(benchmark_lookup_avx PRIVATE trigdx
+                                                     benchmark::benchmark)
+endif()
 
 if(TRIGDX_USE_MKL)
   add_executable(benchmark_mkl benchmark_mkl.cpp)

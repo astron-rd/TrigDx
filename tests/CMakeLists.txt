@@ -10,9 +10,11 @@ target_link_libraries(test_lookup PRIVATE trigdx Catch2::Catch2WithMain)
 add_test(NAME test_lookup COMMAND test_lookup)
 
 # LookupAVX backend test
-add_executable(test_lookup_avx test_lookup_avx.cpp)
-target_link_libraries(test_lookup_avx PRIVATE trigdx Catch2::Catch2WithMain)
-add_test(NAME test_lookup_avx COMMAND test_lookup_avx)
+if(HAVE_AVX)
+  add_executable(test_lookup_avx test_lookup_avx.cpp)
+  target_link_libraries(test_lookup_avx PRIVATE trigdx Catch2::Catch2WithMain)
+  add_test(NAME test_lookup_avx COMMAND test_lookup_avx)
+endif()
 
 # MKL backend test
 if(TRIGDX_USE_MKL)

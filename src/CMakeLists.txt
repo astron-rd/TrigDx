@@ -1,10 +1,12 @@
 include(FetchContent)
-
-add_library(trigdx reference.cpp lookup.cpp lookup_avx.cpp)
+include(FindAVX)
+add_library(trigdx reference.cpp lookup.cpp)
 
 target_include_directories(trigdx PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-target_compile_options(trigdx PRIVATE -O3 -march=native)
+if(HAVE_AVX)
+  target_sources(trigdx PRIVATE lookup_avx.cpp)
+endif()
 
 if(TRIGDX_USE_MKL)
   find_package(MKL REQUIRED)
@@ -22,7 +24,8 @@ if(TRIGDX_USE_GPU)
 endif()
 
 if(TRIGDX_USE_XSIMD)
-  find_package(xsimd QUIET)
+  # Requires XSIMD > 13 for architecture independent dispatching
+  find_package(xsimd 13 QUIET)
   if(NOT TARGET xsimd)
     FetchContent_Declare(
       xsimd
