@@ -66,7 +66,7 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            find tests -type f -executable -exec {} \;
+            find build/tests -type f -executable -exec {} \;
 
   benchmark:
     runs-on: [slurm]
@@ -86,6 +86,4 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            ls -la
-            ls -la benchmarks
-            find benchmarks -type f -executable -exec {} \;
+            find build/benchmarks -type f -executable -exec {} \;
