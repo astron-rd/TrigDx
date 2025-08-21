@@ -13,6 +13,11 @@ jobs:
             gres: gpu:A4000
             cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_MKL=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
             environment_modules: "spack/20250403 intel-oneapi-mkl cuda python"
+          - name: Intel, NVIDIA A4000
+            partition: defq
+            gres: gpu:A4000
+            cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_MKL=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
+            environment_modules: "spack/20250403 intel-oneapi-compilers intel-oneapi-mkl cuda python"
           - name: NVIDIA GH200
             partition: ghq
             gres: gpu:GH200
@@ -38,7 +43,7 @@ jobs:
             cmake -S . -B build ${CMAKE_FLAGS}
             make -C build -j
       - name: Upload build
-        uses: actions/upload-artifact@v4
+        uses: pyTooling/upload-artifact@v4
         with:
           name: build-${{ matrix.name }}
           path: build
@@ -53,7 +58,7 @@ jobs:
       PARTITION_NAME: ${{ matrix.partition }}
     steps:
       - *cleanup
-      - uses: actions/download-artifact@v4
+      - uses: pyTooling/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
       - uses: astron-rd/slurm-action@v1.2
@@ -61,7 +66,7 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            find tests -type f -executable -exec {} \;
+            find build/tests -type f -executable -exec {} \;
 
   benchmark:
     runs-on: [slurm]
@@ -73,7 +78,7 @@ jobs:
       PARTITION_NAME: ${{ matrix.partition }}
     steps:
       - *cleanup
-      - uses: actions/download-artifact@v4
+      - uses: pyTooling/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
       - uses: astron-rd/slurm-action@v1.2
@@ -81,4 +86,4 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            find benchmarks -type f -executable -exec {} \;
+            find build/benchmarks -type f -executable -exec {} \;
