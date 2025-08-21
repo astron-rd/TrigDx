@@ -86,4 +86,6 @@ jobs:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
+            ls -la
+            ls -la benchmarks
             find benchmarks -type f -executable -exec {} \;
