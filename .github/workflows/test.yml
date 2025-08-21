@@ -13,14 +13,23 @@ jobs:
             gres: gpu:A4000
             cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_MKL=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
             environment_modules: "spack/20250403 intel-oneapi-mkl cuda python"
+          - name: NVIDIA GH200
+            partition: ghq
+            gres: gpu:GH200
+            cmake_flags: "-DTRIGDX_USE_GPU=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=90a -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc"
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
       CMAKE_FLAGS: ${{ matrix.cmake_flags }}
       ENVIRONMENT_MODULES: ${{ matrix.environment_modules }}
     steps:
+      - &cleanup
+        name: "Remove old workspace"
+        run: |
+          rm -rf $GITHUB_WORKSPACE/*
+          mkdir -p $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-      - uses: astron-rd/slurm-action@v1
+      - uses: astron-rd/slurm-action@v1.2
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
@@ -43,15 +52,16 @@ jobs:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
     steps:
+      - *cleanup
       - uses: actions/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
-      - uses: astron-rd/slurm-action@v1
+      - uses: astron-rd/slurm-action@v1.2
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            ctest --test-dir build --output-on-failure
+            find tests -type f -executable -exec {} \;
 
   benchmark:
     runs-on: [slurm]
@@ -62,12 +72,13 @@ jobs:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
     steps:
+      - *cleanup
       - uses: actions/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
-      - uses: astron-rd/slurm-action@v1
+      - uses: astron-rd/slurm-action@v1.2
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
           commands: |
-            find build/benchmarks -type f -executable -exec {} \;
+            find benchmarks -type f -executable -exec {} \;
