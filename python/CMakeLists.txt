@@ -1,4 +1,7 @@
-if(NOT TARGET pybind11)
+# Check if pybind11 is already available, otherwise fetch it
+find_package(pybind11 CONFIG QUIET)
+
+if(NOT pybind11_FOUND)
   FetchContent_Declare(
     pybind11
     GIT_REPOSITORY https://github.com/pybind/pybind11.git
