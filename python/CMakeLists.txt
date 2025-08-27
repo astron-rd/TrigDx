@@ -1,4 +1,3 @@
-# Check if pybind11 is already available, otherwise fetch it
 find_package(pybind11 CONFIG QUIET)
 
 if(NOT pybind11_FOUND)
