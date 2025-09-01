@@ -20,6 +20,9 @@ struct GPUBackend::Impl {
     if (h_c) {
       cudaFreeHost(h_c);
     }
+    if (h_e) {
+      cudaFreeHost(h_e);
+    }
     if (d_x) {
       cudaFree(d_x);
     }
@@ -29,6 +32,9 @@ struct GPUBackend::Impl {
     if (d_c) {
       cudaFree(d_c);
     }
+    if (d_e) {
+      cudaFree(d_e);
+    }
   }
 
   void init(size_t n) {
@@ -36,9 +42,11 @@ struct GPUBackend::Impl {
     cudaMallocHost(&h_x, bytes);
     cudaMallocHost(&h_s, bytes);
     cudaMallocHost(&h_c, bytes);
+    cudaMallocHost(&h_e, bytes);
     cudaMalloc(&d_x, bytes);
     cudaMalloc(&d_s, bytes);
     cudaMalloc(&d_c, bytes);
+    cudaMalloc(&d_e, bytes);
   }
 
   void compute_sinf(size_t n, const float *x, float *s) const {
@@ -70,12 +78,23 @@ struct GPUBackend::Impl {
     std::memcpy(c, h_c, bytes);
   }
 
+  void compute_expf(size_t n, const float *x, float *e) const {
+    const size_t bytes = n * sizeof(float);
+    std::memcpy(h_x, x, bytes);
+    cudaMemcpy(d_x, h_x, bytes, cudaMemcpyHostToDevice);
+    launch_expf_kernel(d_x, d_e, n);
+    cudaMemcpy(h_e, d_e, bytes, cudaMemcpyDeviceToHost);
+    std::memcpy(e, h_e, bytes);
+  }
+
   float *h_x = nullptr;
   float *h_s = nullptr;
   float *h_c = nullptr;
+  float *h_e = nullptr;
   float *d_x = nullptr;
   float *d_s = nullptr;
   float *d_c = nullptr;
+  float *d_e = nullptr;
 };
 
 GPUBackend::GPUBackend() : impl(std::make_unique<Impl>()) {}
@@ -95,4 +114,8 @@ void GPUBackend::compute_cosf(size_t n, const float *x, float *c) const {
 void GPUBackend::compute_sincosf(size_t n, const float *x, float *s,
                                  float *c) const {
   impl->compute_sincosf(n, x, s, c);
+}
+
+void GPUBackend::compute_expf(size_t n, const float *x, float *e) const {
+  impl->compute_expf(n, x, e);
 }

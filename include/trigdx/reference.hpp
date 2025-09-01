@@ -10,4 +10,6 @@ public:
 
   void compute_sincosf(size_t n, const float *x, float *s,
                        float *c) const override;
+
+  void compute_expf(size_t n, const float *x, float *e) const override;
 };

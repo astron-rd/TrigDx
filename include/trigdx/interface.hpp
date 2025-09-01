@@ -19,4 +19,7 @@ public:
   // Compute sine and cosine for n elements
   virtual void compute_sincosf(size_t n, const float *x, float *s,
                                float *c) const = 0;
+
+  // Compute exponent for n elements
+  virtual void compute_expf(size_t n, const float *x, float *e) const = 0;
 };

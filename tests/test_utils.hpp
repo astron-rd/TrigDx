@@ -63,3 +63,19 @@ template <typename Backend> inline void test_sincosf(float tol) {
     REQUIRE_THAT(c[i], Catch::Matchers::WithinAbs(c_ref[i], tol));
   }
 }
+
+template <typename Backend> inline void test_expf(float tol) {
+  std::vector<float> x(N), e_ref(N), e(N);
+  init_x(x);
+
+  ReferenceBackend ref;
+  Backend backend;
+  backend.init(N);
+
+  ref.compute_expf(N, x.data(), e_ref.data());
+  backend.compute_expf(N, x.data(), e.data());
+
+  for (size_t i = 0; i < N; ++i) {
+    REQUIRE_THAT(e[i], Catch::Matchers::WithinAbs(e_ref[i], tol));
+  }
+}

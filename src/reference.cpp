@@ -21,3 +21,9 @@ void ReferenceBackend::compute_sincosf(size_t n, const float *x, float *s,
     c[i] = cosf(x[i]);
   }
 }
+
+void ReferenceBackend::compute_expf(size_t n, const float *x, float *e) const {
+  for (size_t i = 0; i < n; ++i) {
+    e[i] = expf(x[i]);
+  }
+}
