@@ -12,7 +12,7 @@ public:
   virtual void init(size_t n = 0) {}
 
   virtual void *allocate_memory(size_t bytes) const {
-    return static_cast<void*>(new uint8_t[bytes]);
+    return static_cast<void *>(new uint8_t[bytes]);
   };
 
   virtual void free_memory(void *ptr) const { delete[] ptr; };
