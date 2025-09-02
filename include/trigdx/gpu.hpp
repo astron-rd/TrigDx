@@ -11,7 +11,6 @@ public:
   GPUBackend();
   ~GPUBackend() override;
 
-  void init(size_t n = 0) override;
   void *allocate_memory(size_t bytes) const override;
   void free_memory(void *ptr) const override;
   void compute_sinf(size_t n, const float *x, float *s) const override;

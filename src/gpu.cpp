@@ -10,15 +10,6 @@
 
 struct GPUBackend::Impl {
 
-  ~Impl() {
-    if (h_x) {
-      cudaFreeHost(h_x);
-    }
-    if (d_x) {
-      cudaFree(d_x);
-    }
-  }
-
   void *allocate_memory(size_t bytes) const {
     void *ptr;
     cudaMallocHost(&ptr, bytes);
@@ -27,57 +18,49 @@ struct GPUBackend::Impl {
 
   void free_memory(void *ptr) const { cudaFreeHost(ptr); }
 
-  void init(size_t n) {
-    const size_t bytes = n * sizeof(float);
-    h_x = reinterpret_cast<float *>(allocate_memory(bytes));
-    cudaMalloc(&d_x, bytes);
-  }
-
   void compute_sinf(size_t n, const float *x, float *s) const {
     const size_t bytes = n * sizeof(float);
-    std::memcpy(h_x, x, bytes);
-    float *d_s;
+    float *d_x, *d_s;
+    cudaMalloc(&d_x, bytes);
     cudaMalloc(&d_s, bytes);
-    cudaMemcpy(d_x, h_x, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x, x, bytes, cudaMemcpyHostToDevice);
     launch_sinf_kernel(d_x, d_s, n);
     cudaMemcpy(s, d_s, bytes, cudaMemcpyDeviceToHost);
+    cudaFree(d_x);
     cudaFree(d_s);
   }
 
   void compute_cosf(size_t n, const float *x, float *c) const {
     const size_t bytes = n * sizeof(float);
-    std::memcpy(h_x, x, bytes);
-    float *d_c;
+    float *d_x, *d_c;
+    cudaMalloc(&d_x, bytes);
     cudaMalloc(&d_c, bytes);
-    cudaMemcpy(d_x, h_x, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x, x, bytes, cudaMemcpyHostToDevice);
     launch_cosf_kernel(d_x, d_c, n);
     cudaMemcpy(c, d_c, bytes, cudaMemcpyDeviceToHost);
+    cudaFree(d_x);
     cudaFree(d_c);
   }
 
   void compute_sincosf(size_t n, const float *x, float *s, float *c) const {
     const size_t bytes = n * sizeof(float);
-    std::memcpy(h_x, x, bytes);
-    float *d_s, *d_c;
+    float *d_x, *d_s, *d_c;
+    cudaMalloc(&d_x, bytes);
     cudaMalloc(&d_s, bytes);
     cudaMalloc(&d_c, bytes);
-    cudaMemcpy(d_x, h_x, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x, x, bytes, cudaMemcpyHostToDevice);
     launch_sincosf_kernel(d_x, d_s, d_c, n);
     cudaMemcpy(s, d_s, bytes, cudaMemcpyDeviceToHost);
     cudaMemcpy(c, d_c, bytes, cudaMemcpyDeviceToHost);
+    cudaFree(d_x);
     cudaFree(d_s);
     cudaFree(d_c);
   }
-
-  float *h_x = nullptr;
-  float *d_x = nullptr;
 };
 
 GPUBackend::GPUBackend() : impl(std::make_unique<Impl>()) {}
 
 GPUBackend::~GPUBackend() = default;
-
-void GPUBackend::init(size_t n) { impl->init(n); }
 
 void *GPUBackend::allocate_memory(size_t bytes) const {
   return impl->allocate_memory(bytes);
