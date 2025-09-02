@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdlib>
 
 // Base interface for all math backends
 class Backend {
@@ -9,6 +10,12 @@ public:
 
   // Optional initialization
   virtual void init(size_t n = 0) {}
+
+  virtual void *allocate_memory(size_t bytes) const {
+    return std::malloc(bytes);
+  };
+
+  virtual void free_memory(void *ptr) const { std::free(ptr); };
 
   // Compute sine for n elements
   virtual void compute_sinf(size_t n, const float *x, float *s) const = 0;

@@ -19,9 +19,17 @@ struct GPUBackend::Impl {
     }
   }
 
+  void *allocate_memory(size_t bytes) const {
+    void *ptr;
+    cudaMallocHost(&ptr, bytes);
+    return ptr;
+  }
+
+  void free_memory(void *ptr) const { cudaFreeHost(ptr); }
+
   void init(size_t n) {
     const size_t bytes = n * sizeof(float);
-    cudaMallocHost(&h_x, bytes);
+    h_x = reinterpret_cast<float *>(allocate_memory(bytes));
     cudaMalloc(&d_x, bytes);
   }
 
@@ -70,6 +78,12 @@ GPUBackend::GPUBackend() : impl(std::make_unique<Impl>()) {}
 GPUBackend::~GPUBackend() = default;
 
 void GPUBackend::init(size_t n) { impl->init(n); }
+
+void *GPUBackend::allocate_memory(size_t bytes) const {
+  return impl->allocate_memory(bytes);
+}
+
+void GPUBackend::free_memory(void *ptr) const { impl->free_memory(ptr); }
 
 void GPUBackend::compute_sinf(size_t n, const float *x, float *s) const {
   impl->compute_sinf(n, x, s);
