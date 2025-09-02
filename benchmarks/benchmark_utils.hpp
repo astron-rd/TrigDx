@@ -57,6 +57,10 @@ static void benchmark_cosf(benchmark::State &state) {
       reinterpret_cast<float *>(backend.allocate_memory(N * sizeof(float)));
   float *c =
       reinterpret_cast<float *>(backend.allocate_memory(N * sizeof(float)));
+      
+      if (!x || !c) {
+         throw std::runtime_error("Buffer allocation failed");
+      }
   auto end = std::chrono::high_resolution_clock::now();
   state.counters["init_ms"] =
       std::chrono::duration_cast<std::chrono::microseconds>(end - start)
@@ -91,6 +95,9 @@ static void benchmark_sincosf(benchmark::State &state) {
       reinterpret_cast<float *>(backend.allocate_memory(N * sizeof(float)));
   float *c =
       reinterpret_cast<float *>(backend.allocate_memory(N * sizeof(float)));
+  if (!x || !s || !c) {
+     throw std::runtime_error("Buffer allocation failed");
+  }
   auto end = std::chrono::high_resolution_clock::now();
   state.counters["init_ms"] =
       std::chrono::duration_cast<std::chrono::microseconds>(end - start)

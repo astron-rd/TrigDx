@@ -12,10 +12,10 @@ public:
   virtual void init(size_t n = 0) {}
 
   virtual void *allocate_memory(size_t bytes) const {
-    return std::malloc(bytes);
+    return static_cast<void*>(new uint8_t[bytes]);
   };
 
-  virtual void free_memory(void *ptr) const { std::free(ptr); };
+  virtual void free_memory(void *ptr) const { delete[] ptr; };
 
   // Compute sine for n elements
   virtual void compute_sinf(size_t n, const float *x, float *s) const = 0;
