@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 
 // Base interface for all math backends
@@ -15,7 +16,7 @@ public:
     return static_cast<void *>(new uint8_t[bytes]);
   };
 
-  virtual void free_memory(void *ptr) const { delete[] ptr; };
+  virtual void free_memory(void *ptr) const { std::free(ptr); };
 
   // Compute sine for n elements
   virtual void compute_sinf(size_t n, const float *x, float *s) const = 0;
