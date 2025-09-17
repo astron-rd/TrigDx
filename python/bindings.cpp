@@ -72,7 +72,9 @@ void bind_backend(py::module &m, const char *name) {
       .def("compute_sincosf", &compute_sincos<float>);
 }
 
-PYBIND11_MODULE(pytrigdx, m) {
+PYBIND11_MODULE(trigdx, m) {
+  m.doc() = "TrigDx python bindings";
+
   py::class_<Backend, std::shared_ptr<Backend>>(m, "Backend")
       .def("init", &Backend::init);
 
