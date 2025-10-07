@@ -11,7 +11,7 @@ static_assert(HAVE_AVX == 0, "__AVX__ should be defined when HAVE_AVX is defined
 #endif
 
 #if defined(HAVE_AVX2) && !defined(__AVX2__)
-static_assert(HAVE_AVX2 == 0, "__AVX__2 should be defined when HAVE_AVX2 is defined, check compile flags (-mavx2)");
+static_assert(HAVE_AVX2 == 0, "__AVX2__ should be defined when HAVE_AVX2 is defined, check compile flags (-mavx2)");
 #endif
 
 template <std::size_t NR_SAMPLES> struct LookupAVXBackend<NR_SAMPLES>::Impl {
