@@ -9,9 +9,7 @@ if(NOT pybind11_FOUND)
 endif()
 
 # Needed to set ${Python_VERSION_MAJOR} and ${Python_VERSION_MINOR}
-find_package(
-  Python REQUIRED
-)
+find_package(Python REQUIRED)
 
 pybind11_add_module(pytrigdx bindings.cpp)
 target_link_libraries(pytrigdx PRIVATE trigdx)
