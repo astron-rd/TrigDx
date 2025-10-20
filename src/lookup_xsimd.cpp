@@ -120,7 +120,7 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
       const b_type dx4 = xsimd::mul(dx2, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
-      const b_type t4 = xsimd::mul(dx4, term3);
+      const b_type t4 = xsimd::mul(dx4, term4);
 
       const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
       const b_type sindx = xsimd::sub(dx, t3);
@@ -183,7 +183,7 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
       const b_type dx4 = xsimd::mul(dx2, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
-      const b_type t4 = xsimd::mul(dx4, term3);
+      const b_type t4 = xsimd::mul(dx4, term4);
 
       idx = xsimd::bitwise_and(idx, mask);
       b_type sinv = b_type::gather(lookup_table_.sin_values.data(), idx);
