@@ -33,11 +33,11 @@ cmake --build . -j
 ctest --output-on-failure -j
 ```
 
-CMake options (common)
-- `TRIGDX_USE_GPU=ON/OFF` — build GPU support
-- `TRIGDX_BUILD_TESTS=ON/OFF` — build tests
-- `TRIGDX_BUILD_BENCHMARKS=ON/OFF` — build benchmarks
-- `TRIGDX_BUILD_PYTHON` — build Python interface
+Common CMake options:
+- `TRIGDX_USE_GPU=ON/OFF` — build GPU support.
+- `TRIGDX_BUILD_TESTS=ON/OFF` — build tests.
+- `TRIGDX_BUILD_BENCHMARKS=ON/OFF` — build benchmarks.
+- `TRIGDX_BUILD_PYTHON` — build Python interface.
 
 ## Contributing
 - Fork → create a feature branch → open a PR.
