@@ -12,6 +12,11 @@ option(TRIGDX_BUILD_TESTS "Build tests" ON)
 option(TRIGDX_BUILD_BENCHMARKS "Build tests" ON)
 option(TRIGDX_BUILD_PYTHON "Build Python interface" ON)
 
+# Add compiler flags
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} -Wall -Wnon-virtual-dtor -Wduplicated-branches -Wvla -Wpointer-arith -Wextra -Wno-unused-parameter"
+)
+
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/trigdx_config.hpp.in
