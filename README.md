@@ -7,7 +7,7 @@ Many applications use the standard library implementations, which prioritise cor
 
 - Replace `std::sin` / `std::cos` calls with faster approximations when a small, bounded reduction in accuracy is acceptable.
 - Use SIMD/vectorized implementations and compact lookup tables for high throughput lookups.
-- Run massively parallel kernels that take advantage of GPU' _Special Function Units_ (SFUs)
+- Run massively parallel kernels that take advantage of a GPU's _Special Function Units_ (SFUs).
 
 ## Requirements
 - A C++ compiler with at least C++17 support (GCC, Clang)
