@@ -1,6 +1,6 @@
 # TrigDx
 
-High‑performance C++ library that provides multiple implementations of transcendental trigonometric functions (sin, cos, tan and variant forms). TrigDx is designed for numerical, signal-processing, and real‑time systems where you can trade a small amount of accuracy for significantly higher throughput on modern CPUs (scalar & SIMD) and NVIDIA GPUs.
+High‑performance C++ library offering multiple implementations of transcendental trigonometric functions (e.g., sin, cos, tan and their variants), designed for numerical, signal‑processing, and real‑time systems where trading a small loss of accuracy for significantly higher throughput on modern CPUs (scalar and SIMD) and NVIDIA GPUs is acceptable.
 
 ## Why TrigDx?
 Many applications use the standard library implementations, which prioritise correctness but are not always optimal for throughput on vectorized or GPU hardware. TrigDx gives you multiple implementations so you can:
