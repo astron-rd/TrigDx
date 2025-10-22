@@ -20,8 +20,8 @@ template <std::size_t NR_SAMPLES> struct lookup_table {
       cos_values[i] = cosf(i * PI_FRAC);
     }
   }
-  std::array<float, NR_SAMPLES> cos_values;
   std::array<float, NR_SAMPLES> sin_values;
+  std::array<float, NR_SAMPLES> cos_values;
 };
 
 template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
@@ -33,7 +33,6 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
 
     constexpr uint_fast32_t VL = b_type::size;
     const uint_fast32_t VS = n - n % VL;
-    const uint_fast32_t Q_PI = NR_SAMPLES / 4U;
     const b_type scale = b_type::broadcast(lookup_table_.SCALE);
     const b_type pi_frac = b_type::broadcast(lookup_table_.PI_FRAC);
     const m_type mask = m_type::broadcast(lookup_table_.MASK);
@@ -42,7 +41,7 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
     const b_type term2 = b_type::broadcast(lookup_table_.TERM2); // 1/2!
     const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
     const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
-    const m_type quarter_pi = m_type::broadcast(Q_PI);
+
     uint_fast32_t i;
     for (i = 0; i < VS; i += VL) {
       const b_type vx = b_type::load(a + i, Tag());
@@ -60,7 +59,7 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
       const b_type dx4 = xsimd::mul(dx2, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
-      const b_type t4 = xsimd::mul(dx4, term3);
+      const b_type t4 = xsimd::mul(dx4, term4);
 
       const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
 
@@ -98,7 +97,6 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
 
     constexpr uint_fast32_t VL = b_type::size;
     const uint_fast32_t VS = n - n % VL;
-    const uint_fast32_t Q_PI = NR_SAMPLES / 4U;
     const b_type scale = b_type::broadcast(lookup_table_.SCALE);
     const b_type pi_frac = b_type::broadcast(lookup_table_.PI_FRAC);
     const m_type mask = m_type::broadcast(lookup_table_.MASK);
@@ -107,7 +105,7 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
     const b_type term2 = b_type::broadcast(lookup_table_.TERM2); // 1/2!
     const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
     const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
-    const m_type quarter_pi = m_type::broadcast(Q_PI);
+
     uint_fast32_t i;
     for (i = 0; i < VS; i += VL) {
       const b_type vx = b_type::load(a + i, Tag());
@@ -160,7 +158,6 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
 
     constexpr uint_fast32_t VL = b_type::size;
     const uint_fast32_t VS = n - n % VL;
-    const uint_fast32_t Q_PI = NR_SAMPLES / 4U;
     const b_type scale = b_type::broadcast(lookup_table_.SCALE);
     const m_type mask = m_type::broadcast(lookup_table_.MASK);
     const b_type pi_frac = b_type::broadcast(lookup_table_.PI_FRAC);
@@ -170,7 +167,6 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
     const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
     const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
 
-    const m_type quarter_pi = m_type::broadcast(Q_PI);
     uint_fast32_t i;
     for (i = 0; i < VS; i += VL) {
       const b_type vx = b_type::load(a + i, Tag());
