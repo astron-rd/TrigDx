@@ -46,9 +46,9 @@ Common CMake options:
 
 ## Reporting issues
 When opening an issue for incorrect results or performance regressions, please include:
-- Platform and CPU/GPU model
-- Compiler and version with exact compile flags
-- Small reproducer (input data and the TrigDx implementation used)
+- Platform and CPU/GPU model.
+- Compiler and version with exact compile flags.
+- Small reproducer (input data and the TrigDx implementation used).
   
 ## License
 See the LICENSE file in the repository for licensing details.
