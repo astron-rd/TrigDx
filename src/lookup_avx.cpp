@@ -12,7 +12,7 @@ static_assert(HAVE_AVX == 0, "__AVX__ should be defined when HAVE_AVX is "
 #endif
 
 #if defined(HAVE_AVX2) && !defined(__AVX2__)
-static_assert(HAVE_AVX2 == 0, "__AVX__2 should be defined when HAVE_AVX2 is "
+static_assert(HAVE_AVX2 == 0, "__AVX2__ should be defined when HAVE_AVX2 is "
                               "defined");
 #endif
 
