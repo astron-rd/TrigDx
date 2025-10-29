@@ -16,7 +16,7 @@ public:
     return static_cast<void *>(new uint8_t[bytes]);
   };
 
-  virtual void free_memory(void *ptr) const { std::free(ptr); };
+  virtual void free_memory(void *ptr) const { delete[] static_cast<uint8_t*>(ptr); };
 
   // Compute sine for n elements
   virtual void compute_sinf(size_t n, const float *x, float *s) const = 0;

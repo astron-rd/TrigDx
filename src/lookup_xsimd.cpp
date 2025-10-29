@@ -56,7 +56,7 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
       const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx2, dx2);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
       const b_type t4 = xsimd::mul(dx4, term4);
@@ -115,7 +115,7 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
       const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx2, dx2);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
       const b_type t4 = xsimd::mul(dx4, term4);
@@ -176,20 +176,20 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
       const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx2, dx2);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
       const b_type t4 = xsimd::mul(dx4, term4);
 
       idx = xsimd::bitwise_and(idx, mask);
-      b_type sinv = b_type::gather(lookup_table_.sin_values.data(), idx);
-      b_type cosv = b_type::gather(lookup_table_.cos_values.data(), idx);
+      const b_type sinv_base = b_type::gather(lookup_table_.sin_values.data(), idx);
+      const b_type cosv_base = b_type::gather(lookup_table_.cos_values.data(), idx);
 
       const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
       const b_type sindx = xsimd::sub(dx, t3);
 
-      sinv = xsimd::add(xsimd::mul(cosv, sindx), xsimd::mul(sinv, cosdx));
-      cosv = xsimd::sub(xsimd::mul(cosv, cosdx), xsimd::mul(sinv, sindx));
+      b_type sinv = xsimd::add(xsimd::mul(cosv_base, sindx), xsimd::mul(sinv_base, cosdx));
+      b_type cosv = xsimd::sub(xsimd::mul(cosv_base, cosdx), xsimd::mul(sinv_base, sindx));
 
       sinv.store(s + i, Tag());
       cosv.store(c + i, Tag());
