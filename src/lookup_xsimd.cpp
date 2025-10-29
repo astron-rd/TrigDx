@@ -78,7 +78,7 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
       const float dx = a[i] - idx * lookup_table_.PI_FRAC;
       const float dx2 = dx * dx;
       const float dx3 = dx2 * dx;
-      const float dx4 = dx3 * dx;
+      const float dx4 = dx2 * dx2;
       const float cosdx =
           1.0f - lookup_table_.TERM2 * dx2 + lookup_table_.TERM4 * dx4;
       const float sindx = dx - lookup_table_.TERM3 * dx3;
@@ -138,7 +138,7 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
       const float dx = a[i] - idx * lookup_table_.PI_FRAC;
       const float dx2 = dx * dx;
       const float dx3 = dx2 * dx;
-      const float dx4 = dx3 * dx;
+      const float dx4 = dx2 * dx2;
       const float cosdx =
           1.0f - lookup_table_.TERM2 * dx2 + lookup_table_.TERM4 * dx4;
       const float sindx = dx - lookup_table_.TERM3 * dx3;
@@ -202,7 +202,7 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
       const float dx = a[i] - idx * lookup_table_.PI_FRAC;
       const float dx2 = dx * dx;
       const float dx3 = dx2 * dx;
-      const float dx4 = dx3 * dx;
+      const float dx4 = dx2 * dx2;
       const float cosdx =
           1.0f - lookup_table_.TERM2 * dx2 + lookup_table_.TERM4 * dx4;
       const float sindx = dx - lookup_table_.TERM3 * dx3;

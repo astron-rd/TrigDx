@@ -26,6 +26,9 @@ static void benchmark_sinf(benchmark::State &state) {
       reinterpret_cast<float *>(backend.allocate_memory(N * sizeof(float)));
   float *s =
       reinterpret_cast<float *>(backend.allocate_memory(N * sizeof(float)));
+  if (!x || !s) {
+    throw std::runtime_error("Buffer allocation failed");
+  }
   auto end = std::chrono::high_resolution_clock::now();
   state.counters["init_ms"] =
       std::chrono::duration_cast<std::chrono::microseconds>(end - start)
