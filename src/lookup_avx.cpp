@@ -89,7 +89,6 @@ template <std::size_t NR_SAMPLES> struct LookupAVXBackend<NR_SAMPLES>::Impl {
     constexpr std::size_t VL = 8; // AVX processes 8 floats
     const __m256 scale = _mm256_set1_ps(SCALE);
     const __m256i mask = _mm256_set1_epi32(MASK);
-    const __m256i quarter_pi = _mm256_set1_epi32(NR_SAMPLES / 4);
 
     std::size_t i = 0;
     for (; i + VL <= n; i += VL) {
