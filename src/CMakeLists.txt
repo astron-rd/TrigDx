@@ -63,7 +63,7 @@ if(TRIGDX_USE_XSIMD)
   endif()
 
   target_sources(trigdx PRIVATE lookup_xsimd.cpp)
-  target_link_libraries(trigdx PRIVATE xsimd)
+  target_link_libraries(trigdx PRIVATE xsimd xtl)
 endif()
 
 target_include_directories(
