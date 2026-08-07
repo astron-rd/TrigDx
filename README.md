@@ -45,9 +45,9 @@ A simple standalone example is available at `examples/basic_usage.cpp`.
 
 To build and run it:
 ```bash
-cmake -DCMAKE_BUILD_TYPE=Release -DTRIGDX_BUILD_EXAMPLES=ON ..
-cmake --build . --target example_basic_usage -j
-./examples/example_basic_usage
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DTRIGDX_BUILD_EXAMPLES=ON
+cmake --build build --target example_basic_usage -j
+./build/examples/example_basic_usage
 ```
 
 ## Contributing
