@@ -41,7 +41,7 @@ Common CMake options:
 - `TRIGDX_BUILD_PYTHON` — build Python interface.
 
 ## Code example
-A simple standalone example is available at `/home/runner/work/TrigDx/TrigDx/examples/basic_usage.cpp`.
+A simple standalone example is available at `examples/basic_usage.cpp`.
 
 To build and run it:
 ```bash
