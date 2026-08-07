@@ -51,6 +51,17 @@ if(TRIGDX_USE_XSIMD)
       GIT_TAG 13.2.0)
     FetchContent_MakeAvailable(xsimd)
   endif()
+
+  # Requires xtl > 0.7.x for XSIMD > 13
+  find_package(xtl 0.7.7 QUIET)
+  if(NOT TARGET xtl)
+    FetchContent_Declare(
+      xtl
+      GIT_REPOSITORY https://github.com/xtensor-stack/xtl.git
+      GIT_TAG 0.7.7)
+    FetchContent_MakeAvailable(xtl)
+  endif()
+
   target_sources(trigdx PRIVATE lookup_xsimd.cpp)
   target_link_libraries(trigdx PRIVATE xsimd)
 endif()
