@@ -10,7 +10,7 @@ option(TRIGDX_USE_GPU "Enable GPU backend" OFF)
 option(TRIGDX_USE_XSIMD "Enable XSIMD backend" OFF)
 option(TRIGDX_BUILD_TESTS "Build tests" ON)
 option(TRIGDX_BUILD_BENCHMARKS "Build benchmarks" ON)
-option(TRIGDX_BUILD_EXAMPLES "Build example programs" ON)
+option(TRIGDX_BUILD_EXAMPLES "Build example programs" OFF)
 option(TRIGDX_BUILD_PYTHON "Build Python interface" ON)
 
 # Add compiler flags
