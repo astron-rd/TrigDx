@@ -1,0 +1,2 @@
+add_executable(example_basic_usage basic_usage.cpp)
+target_link_libraries(example_basic_usage PRIVATE trigdx)
