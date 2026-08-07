@@ -6,13 +6,14 @@
 
 int main() {
   constexpr float pi = 3.14159265358979323846f;
+  constexpr std::size_t lookup_table_size = 16384;
   const std::vector<float> angles = {0.0f,      pi / 6.0f, pi / 4.0f,
                                      pi / 3.0f, pi / 2.0f, pi};
 
   std::vector<float> sin_values(angles.size());
   std::vector<float> cos_values(angles.size());
 
-  LookupBackend<16384> backend;
+  LookupBackend<lookup_table_size> backend;
   backend.init();
   backend.compute_sincosf(angles.size(), angles.data(), sin_values.data(),
                           cos_values.data());
