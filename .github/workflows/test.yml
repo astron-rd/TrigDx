@@ -30,7 +30,7 @@ jobs:
           rm -rf $GITHUB_WORKSPACE/*
           mkdir -p $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-      - uses: astron-rd/slurm-action@v1.2
+      - uses: astron-rd/slurm-action@v1.3
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
@@ -57,7 +57,7 @@ jobs:
       - uses: pyTooling/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
-      - uses: astron-rd/slurm-action@v1.2
+      - uses: astron-rd/slurm-action@v1.3
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
@@ -77,7 +77,7 @@ jobs:
       - uses: pyTooling/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
-      - uses: astron-rd/slurm-action@v1.2
+      - uses: astron-rd/slurm-action@v1.3
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
