@@ -66,6 +66,21 @@ if(TRIGDX_USE_XSIMD)
   target_link_libraries(trigdx PRIVATE xsimd xtl)
 endif()
 
+if (TRIGDX_USE_HWY)
+  find_package(highway QUIET)
+  if(NOT TARGET highway)
+    FetchContent_Declare(
+      highway
+      GIT_REPOSITORY https://github.com/google/highway.git
+      GIT_TAG 1.4.0
+    )
+    FetchContent_MakeAvailable(highway)
+  endif()
+
+  target_sources(trigdx PRIVATE lookup_highway.cpp)
+  target_link_libraries(trigdx PRIVATE highway)
+endif()
+
 target_include_directories(
   trigdx INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
