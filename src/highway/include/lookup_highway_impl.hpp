@@ -6,10 +6,18 @@
 
 namespace highway_impl {
 
-// Computes base-2 logarithm by converting to float. Supports dynamic dispatch.
 void compute_sinf(size_t n, const float *HWY_RESTRICT x,
-                                const float *HWY_RESTRICT lookup,
-                                const size_t mask, const float scale,
-                                float *HWY_RESTRICT s);
+                  const float *HWY_RESTRICT lookup, const size_t mask,
+                  const float scale, float *HWY_RESTRICT s);
+
+void compute_cosf(size_t n, const float *HWY_RESTRICT x,
+                  const float *HWY_RESTRICT lookup, const size_t mask,
+                  const float scale, const size_t sample_offset,
+                  float *HWY_RESTRICT c);
+
+void compute_sincosf(size_t n, const float *HWY_RESTRICT x,
+                     const float *HWY_RESTRICT lookup, const size_t mask,
+                     const float scale, const size_t sample_offset,
+                     float *HWY_RESTRICT s, float *HWY_RESTRICT c);
 
 } // namespace highway_impl

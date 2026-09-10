@@ -28,7 +28,7 @@ template <std::size_t NR_SAMPLES> struct LookupHighwayBackend<NR_SAMPLES>::Impl 
 
   void compute_sincosf(std::size_t n, const float *x, float *s,
                        float *c) const {
-
+    highway_impl::compute_sincosf(n, x, this->lookup.data(), this->MASK, this->SCALE, NR_SAMPLES / 4, s, c);
   }
 
   void compute_sinf(std::size_t n, const float *x, float *s) const {
@@ -36,6 +36,7 @@ template <std::size_t NR_SAMPLES> struct LookupHighwayBackend<NR_SAMPLES>::Impl 
   }
 
   void compute_cosf(std::size_t n, const float *x, float *c) const {
+    highway_impl::compute_cosf(n, x, this->lookup.data(), this->MASK, this->SCALE, NR_SAMPLES / 4, c);
   }
 };
 
