@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "trigdx/lookup_highway.hpp"
+#include "highway/include/lookup_highway_impl.hpp"
 
 #if defined(HAVE_AVX) && !defined(__AVX__)
 static_assert(HAVE_AVX == 0, "__AVX__ should be defined when HAVE_AVX is "
@@ -31,11 +32,10 @@ template <std::size_t NR_SAMPLES> struct LookupHighwayBackend<NR_SAMPLES>::Impl 
   }
 
   void compute_sinf(std::size_t n, const float *x, float *s) const {
-
+    highway_impl::compute_sinf(n, x, this->lookup.data(), this->MASK, this->SCALE, s);
   }
 
   void compute_cosf(std::size_t n, const float *x, float *c) const {
-
   }
 };
 
