@@ -81,9 +81,9 @@ HWY_ATTR void compute_cosf(size_t n, const T *HWY_RESTRICT x,
 }
 
 HWY_ATTR void compute_sincosf(size_t n, const T *HWY_RESTRICT x,
-                           const T *HWY_RESTRICT lookup, const size_t mask,
-                           const float scale, const size_t sample_offset,
-                           T *HWY_RESTRICT s, T *HWY_RESTRICT c) {
+                              const T *HWY_RESTRICT lookup, const size_t mask,
+                              const float scale, const size_t sample_offset,
+                              T *HWY_RESTRICT s, T *HWY_RESTRICT c) {
   const hn::ScalableTag<T> dfloat;
   const hn::ScalableTag<int32_t> dint;
 
@@ -97,7 +97,7 @@ HWY_ATTR void compute_sincosf(size_t n, const T *HWY_RESTRICT x,
     const auto scaled = hn::Mul(vx, vscale);
     const auto idx = hn::FloorInt(scaled);
     const auto idx_masked = hn::And(idx, vmask);
-    
+
     const auto idx_cos = hn::Add(idx, vsample_offset);
     const auto idx_cos_masked = hn::And(idx_cos, vmask);
 
@@ -145,11 +145,11 @@ void compute_cosf(size_t n, const float *HWY_RESTRICT x,
 HWY_EXPORT(compute_sincosf);
 
 void compute_sincosf(size_t n, const float *HWY_RESTRICT x,
-                  const float *HWY_RESTRICT lookup, const size_t mask,
-                  const float scale, const size_t sample_offset,
-                  float *HWY_RESTRICT s, float *HWY_RESTRICT c) {
+                     const float *HWY_RESTRICT lookup, const size_t mask,
+                     const float scale, const size_t sample_offset,
+                     float *HWY_RESTRICT s, float *HWY_RESTRICT c) {
   return HWY_DYNAMIC_DISPATCH(compute_sincosf)(n, x, lookup, mask, scale,
-                                            sample_offset, s, c);
+                                               sample_offset, s, c);
 }
 
 } // namespace highway_impl

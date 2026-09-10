@@ -66,18 +66,24 @@ if(TRIGDX_USE_XSIMD)
   target_link_libraries(trigdx PRIVATE xsimd xtl)
 endif()
 
-if (TRIGDX_USE_HWY)
+if(TRIGDX_USE_HWY)
   FetchContent_Declare(
     hwy
     GIT_REPOSITORY https://github.com/google/highway.git
-    GIT_TAG 1.4.0
-    )
-  SET(HWY_ENABLE_CONTRIB OFF CACHE BOOL "")
-  SET(HWY_ENABLE_EXAMPLES OFF CACHE BOOL "")
-  SET(HWY_ENABLE_TESTS OFF CACHE BOOL "")
+    GIT_TAG 1.4.0)
+  set(HWY_ENABLE_CONTRIB
+      OFF
+      CACHE BOOL "")
+  set(HWY_ENABLE_EXAMPLES
+      OFF
+      CACHE BOOL "")
+  set(HWY_ENABLE_TESTS
+      OFF
+      CACHE BOOL "")
   FetchContent_MakeAvailable(hwy)
 
-  target_sources(trigdx PRIVATE lookup_highway.cpp highway/lookup_highway_impl.cpp)
+  target_sources(trigdx PRIVATE lookup_highway.cpp
+                                highway/lookup_highway_impl.cpp)
   target_link_libraries(trigdx PRIVATE hwy)
 endif()
 

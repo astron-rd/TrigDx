@@ -40,6 +40,7 @@ endif()
 # Highway backend test
 if(TRIGDX_USE_HWY)
   add_executable(test_lookup_highway test_lookup_highway.cpp)
-  target_link_libraries(test_lookup_highway PRIVATE trigdx Catch2::Catch2WithMain)
+  target_link_libraries(test_lookup_highway PRIVATE trigdx
+                                                    Catch2::Catch2WithMain)
   add_test(NAME test_lookup_highway COMMAND test_lookup_highway)
 endif()
