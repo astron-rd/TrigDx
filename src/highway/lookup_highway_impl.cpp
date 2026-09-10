@@ -3,18 +3,10 @@
 #include <cstdint>
 #include <stdio.h>
 
-// >>>> for dynamic dispatch only, skip if you want static dispatch
-
-// First undef to prevent error when re-included.
 #undef HWY_TARGET_INCLUDE
-// For dynamic dispatch, specify the name of the current file (unfortunately
-// __FILE__ is not reliable) so that foreach_target.h can re-include it.
 #define HWY_TARGET_INCLUDE                                                     \
   "/home/viv/Code/TrigDx/src/highway/lookup_highway_impl.cpp"
-// Generates code for each enabled target by re-including this source file.
 #include "hwy/foreach_target.h" // IWYU pragma: keep
-
-// <<<< end of dynamic dispatch
 
 // Must come after foreach_target.h to avoid redefinition errors.
 #include "hwy/highway.h"
@@ -39,15 +31,21 @@ HWY_ATTR void compute_sinf(size_t n, const T *HWY_RESTRICT x,
   const auto vscale = hn::Set(dfloat, scale);
   const auto vmask = hn::Set(dint, mask);
 
-  for (size_t i = 0; i < n; i += hn::Lanes(dfloat)) {
+  size_t i = 0;
+  for (; i + hn::Lanes(dfloat) <= n; i += hn::Lanes(dfloat)) {
     const auto vx = hn::LoadU(dfloat, &x[i]);
     const auto scaled = hn::Mul(vx, vscale);
-    const auto idx = hn::NearestInt(scaled);
+    const auto idx = hn::FloorInt(scaled);
     const auto idx_masked = hn::And(idx, vmask);
 
     const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
 
     hn::StoreU(sinv, dfloat, &s[i]);
+  }
+
+  for (; i < n; i += 1) {
+    std::size_t idx = static_cast<std::size_t>(x[i] * scale) & mask;
+    s[i] = lookup[idx];
   }
 }
 
@@ -58,18 +56,14 @@ HWY_ATTR void compute_sinf(size_t n, const T *HWY_RESTRICT x,
 
 namespace highway_impl {
 
-// This macro declares a static array used for dynamic dispatch; it resides in
-// the same outer namespace that contains FloorLog2.
+// This macro declares a static array used for dynamic dispatch
 HWY_EXPORT(compute_sinf);
 
 void compute_sinf(size_t n, const float *HWY_RESTRICT x,
-                                const float *HWY_RESTRICT lookup, const size_t mask,
-                                const float scale, float *HWY_RESTRICT s) {
+                  const float *HWY_RESTRICT lookup, const size_t mask,
+                  const float scale, float *HWY_RESTRICT s) {
   return HWY_DYNAMIC_DISPATCH(compute_sinf)(n, x, lookup, mask, scale, s);
 }
-
-// Optional: anything to compile only once, e.g. non-SIMD implementations of
-// public functions provided by this module, can go inside #if HWY_ONCE.
 
 } // namespace highway_impl
 #endif // HWY_ONCE
