@@ -56,7 +56,7 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
       const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx3, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
       const b_type t4 = xsimd::mul(dx4, term4);
@@ -115,7 +115,7 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
       const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx3, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
       const b_type t4 = xsimd::mul(dx4, term4);
@@ -176,7 +176,7 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
       const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx2, dx);
+      const b_type dx4 = xsimd::mul(dx3, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
       const b_type t3 = xsimd::mul(dx3, term3);
       const b_type t4 = xsimd::mul(dx4, term4);
