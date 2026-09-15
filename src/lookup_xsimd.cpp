@@ -39,8 +39,6 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
 
     const b_type term1 = b_type::broadcast(lookup_table_.TERM1); // 1
     const b_type term2 = b_type::broadcast(lookup_table_.TERM2); // 1/2!
-    const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
-    const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
 
     uint_fast32_t i;
     for (i = 0; i < VS; i += VL) {
@@ -55,15 +53,11 @@ template <std::size_t NR_SAMPLES> struct cosf_dispatcher {
 
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
-      const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx3, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
-      const b_type t3 = xsimd::mul(dx3, term3);
-      const b_type t4 = xsimd::mul(dx4, term4);
 
-      const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
+      const b_type cosdx = xsimd::sub(term1, t2);
 
-      const b_type sindx = xsimd::sub(dx, t3);
+      const b_type sindx = dx;
 
       cosv = xsimd::sub(xsimd::mul(cosv, cosdx), xsimd::mul(sinv, sindx));
 
@@ -103,8 +97,6 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
 
     const b_type term1 = b_type::broadcast(lookup_table_.TERM1); // 1
     const b_type term2 = b_type::broadcast(lookup_table_.TERM2); // 1/2!
-    const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
-    const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
 
     uint_fast32_t i;
     for (i = 0; i < VS; i += VL) {
@@ -114,14 +106,10 @@ template <std::size_t NR_SAMPLES> struct sinf_dispatcher {
       b_type f_idx = xsimd::to_float(idx);
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
-      const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx3, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
-      const b_type t3 = xsimd::mul(dx3, term3);
-      const b_type t4 = xsimd::mul(dx4, term4);
 
-      const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
-      const b_type sindx = xsimd::sub(dx, t3);
+      const b_type cosdx = xsimd::sub(term1, t2);
+      const b_type sindx = dx;
 
       idx = xsimd::bitwise_and(idx, mask);
       b_type sinv = b_type::gather(lookup_table_.sin_values.data(), idx);
@@ -164,8 +152,6 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
 
     const b_type term1 = b_type::broadcast(lookup_table_.TERM1); // 1
     const b_type term2 = b_type::broadcast(lookup_table_.TERM2); // 1/2!
-    const b_type term3 = b_type::broadcast(lookup_table_.TERM3); // 1/3!
-    const b_type term4 = b_type::broadcast(lookup_table_.TERM4); // 1/4!
 
     uint_fast32_t i;
     for (i = 0; i < VS; i += VL) {
@@ -175,18 +161,14 @@ template <std::size_t NR_SAMPLES> struct sin_cosf_dispatcher {
       b_type f_idx = xsimd::to_float(idx);
       const b_type dx = xsimd::sub(vx, xsimd::mul(f_idx, pi_frac));
       const b_type dx2 = xsimd::mul(dx, dx);
-      const b_type dx3 = xsimd::mul(dx2, dx);
-      const b_type dx4 = xsimd::mul(dx3, dx);
       const b_type t2 = xsimd::mul(dx2, term2);
-      const b_type t3 = xsimd::mul(dx3, term3);
-      const b_type t4 = xsimd::mul(dx4, term4);
 
       idx = xsimd::bitwise_and(idx, mask);
       b_type sinv = b_type::gather(lookup_table_.sin_values.data(), idx);
       b_type cosv = b_type::gather(lookup_table_.cos_values.data(), idx);
 
-      const b_type cosdx = xsimd::add(xsimd::sub(term1, t2), t4);
-      const b_type sindx = xsimd::sub(dx, t3);
+      const b_type cosdx = xsimd::sub(term1, t2);
+      const b_type sindx = dx;
 
       sinv = xsimd::add(xsimd::mul(cosv, sindx), xsimd::mul(sinv, cosdx));
       cosv = xsimd::sub(xsimd::mul(cosv, cosdx), xsimd::mul(sinv, sindx));
