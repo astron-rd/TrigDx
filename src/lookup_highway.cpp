@@ -18,7 +18,8 @@ template <std::size_t NR_SAMPLES>
 struct LookupHighwayBackend<NR_SAMPLES>::Impl {
   std::vector<float> lookup;
   static constexpr std::size_t MASK = NR_SAMPLES - 1;
-  static constexpr float SCALE = NR_SAMPLES / (2.0f * float(M_PI));
+  static constexpr float SCALE = NR_SAMPLES / (2.0f * M_PIf32);
+  static constexpr float PI_FRAC = (2.0f * M_PIf32) / NR_SAMPLES;
 
   void init() {
     lookup.resize(NR_SAMPLES);
@@ -30,17 +31,17 @@ struct LookupHighwayBackend<NR_SAMPLES>::Impl {
   void compute_sincosf(std::size_t n, const float *x, float *s,
                        float *c) const {
     highway_impl::compute_sincosf(n, x, this->lookup.data(), this->MASK,
-                                  this->SCALE, NR_SAMPLES / 4, s, c);
+                                  this->SCALE, this->PI_FRAC, NR_SAMPLES / 4, s, c);
   }
 
   void compute_sinf(std::size_t n, const float *x, float *s) const {
     highway_impl::compute_sinf(n, x, this->lookup.data(), this->MASK,
-                               this->SCALE, s);
+                               this->SCALE, this->PI_FRAC, NR_SAMPLES / 4, s);
   }
 
   void compute_cosf(std::size_t n, const float *x, float *c) const {
     highway_impl::compute_cosf(n, x, this->lookup.data(), this->MASK,
-                               this->SCALE, NR_SAMPLES / 4, c);
+                               this->SCALE, this->PI_FRAC, NR_SAMPLES / 4, c);
   }
 };
 

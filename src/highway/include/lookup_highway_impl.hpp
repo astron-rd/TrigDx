@@ -8,16 +8,18 @@ namespace highway_impl {
 
 void compute_sinf(size_t n, const float *HWY_RESTRICT x,
                   const float *HWY_RESTRICT lookup, const size_t mask,
-                  const float scale, float *HWY_RESTRICT s);
+                  const float scale, const float pi_frac,
+                  const size_t sample_offset, float *HWY_RESTRICT s);
 
 void compute_cosf(size_t n, const float *HWY_RESTRICT x,
                   const float *HWY_RESTRICT lookup, const size_t mask,
-                  const float scale, const size_t sample_offset,
-                  float *HWY_RESTRICT c);
+                  const float scale, const float pi_frac,
+                  const size_t sample_offset, float *HWY_RESTRICT c);
 
 void compute_sincosf(size_t n, const float *HWY_RESTRICT x,
                      const float *HWY_RESTRICT lookup, const size_t mask,
-                     const float scale, const size_t sample_offset,
-                     float *HWY_RESTRICT s, float *HWY_RESTRICT c);
+                     const float scale, const float pi_frac,
+                     const size_t sample_offset, float *HWY_RESTRICT s,
+                     float *HWY_RESTRICT c);
 
 } // namespace highway_impl

@@ -21,23 +21,54 @@ namespace hn = hwy::HWY_NAMESPACE;
 
 using T = float;
 
+static constexpr float TERM1 = 1.0f;         // 1
+static constexpr float TERM2 = 0.5f;         // 1/2!
+static constexpr float TERM3 = 1.0f / 6.0f;  // 1/3!
+static constexpr float TERM4 = 1.0f / 24.0f; // 1/4!
+
 HWY_ATTR void compute_sinf(size_t n, const T *HWY_RESTRICT x,
                            const T *HWY_RESTRICT lookup, const size_t mask,
-                           const float scale, T *HWY_RESTRICT s) {
+                           const float scale, const float pi_frac,
+                           const size_t sample_offset, T *HWY_RESTRICT s) {
   const hn::ScalableTag<T> dfloat;
   const hn::ScalableTag<int32_t> dint;
 
   const auto vscale = hn::Set(dfloat, scale);
   const auto vmask = hn::Set(dint, mask);
+  const auto vsample_offset = hn::Set(dint, sample_offset);
+  const auto vpi_frac = hn::Set(dfloat, pi_frac);
+
+  const auto term1 = hn::Set(dfloat, TERM1);
+  const auto term2 = hn::Set(dfloat, TERM2);
+  const auto term3 = hn::Set(dfloat, TERM3);
+  const auto term4 = hn::Set(dfloat, TERM4);
 
   size_t i = 0;
   for (; i + hn::Lanes(dfloat) <= n; i += hn::Lanes(dfloat)) {
     const auto vx = hn::LoadU(dfloat, &x[i]);
     const auto scaled = hn::Mul(vx, vscale);
     const auto idx = hn::FloorInt(scaled);
+    const auto idx_float = hn::ConvertTo(dfloat, idx);
+    const auto idx_cos = hn::Add(idx, vsample_offset);
     const auto idx_masked = hn::And(idx, vmask);
+    const auto idx_cos_masked = hn::And(idx_cos, vmask);
 
-    const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
+    const auto dx = hn::Sub(vx, hn::Mul(idx_float, vpi_frac));
+    const auto dx2 = hn::Mul(dx, dx);
+    const auto dx3 = hn::Mul(dx2, dx);
+    const auto dx4 = hn::Mul(dx3, dx);
+
+    const auto t2 = hn::Mul(dx2, term2);
+    const auto t3 = hn::Mul(dx3, term3);
+    const auto t4 = hn::Mul(dx4, term4);
+
+    const auto cosdx = hn::Add(hn::Sub(term1, t2), t4);
+    const auto sindx = hn::Sub(dx, t3);
+
+    auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
+    const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
+
+    sinv = hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
 
     hn::StoreU(sinv, dfloat, &s[i]);
   }
@@ -50,24 +81,47 @@ HWY_ATTR void compute_sinf(size_t n, const T *HWY_RESTRICT x,
 
 HWY_ATTR void compute_cosf(size_t n, const T *HWY_RESTRICT x,
                            const T *HWY_RESTRICT lookup, const size_t mask,
-                           const float scale, const size_t sample_offset,
-                           T *HWY_RESTRICT c) {
+                           const float scale, const float pi_frac,
+                           const size_t sample_offset, T *HWY_RESTRICT c) {
   const hn::ScalableTag<T> dfloat;
   const hn::ScalableTag<int32_t> dint;
 
   const auto vscale = hn::Set(dfloat, scale);
   const auto vmask = hn::Set(dint, mask);
   const auto vsample_offset = hn::Set(dint, sample_offset);
+  const auto vpi_frac = hn::Set(dfloat, pi_frac);
+
+  const auto term1 = hn::Set(dfloat, TERM1);
+  const auto term2 = hn::Set(dfloat, TERM2);
+  const auto term3 = hn::Set(dfloat, TERM3);
+  const auto term4 = hn::Set(dfloat, TERM4);
 
   size_t i = 0;
   for (; i + hn::Lanes(dfloat) <= n; i += hn::Lanes(dfloat)) {
     const auto vx = hn::LoadU(dfloat, &x[i]);
     const auto scaled = hn::Mul(vx, vscale);
     const auto idx = hn::FloorInt(scaled);
+    const auto idx_float = hn::ConvertTo(dfloat, idx);
     const auto idx_cos = hn::Add(idx, vsample_offset);
-    const auto idx_masked = hn::And(idx_cos, vmask);
+    const auto idx_masked = hn::And(idx, vmask);
+    const auto idx_cos_masked = hn::And(idx_cos, vmask);
 
-    const auto cosv = hn::GatherIndex(dfloat, lookup, idx_masked);
+    const auto dx = hn::Sub(vx, hn::Mul(idx_float, vpi_frac));
+    const auto dx2 = hn::Mul(dx, dx);
+    const auto dx3 = hn::Mul(dx2, dx);
+    const auto dx4 = hn::Mul(dx3, dx);
+
+    const auto t2 = hn::Mul(dx2, term2);
+    const auto t3 = hn::Mul(dx3, term3);
+    const auto t4 = hn::Mul(dx4, term4);
+
+    const auto cosdx = hn::Add(hn::Sub(term1, t2), t4);
+    const auto sindx = hn::Sub(dx, t3);
+
+    const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
+    auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
+
+    cosv = hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
 
     hn::StoreU(cosv, dfloat, &c[i]);
   }
@@ -81,27 +135,49 @@ HWY_ATTR void compute_cosf(size_t n, const T *HWY_RESTRICT x,
 
 HWY_ATTR void compute_sincosf(size_t n, const T *HWY_RESTRICT x,
                               const T *HWY_RESTRICT lookup, const size_t mask,
-                              const float scale, const size_t sample_offset,
-                              T *HWY_RESTRICT s, T *HWY_RESTRICT c) {
+                              const float scale, const float pi_frac,
+                              const size_t sample_offset, T *HWY_RESTRICT s,
+                              T *HWY_RESTRICT c) {
   const hn::ScalableTag<T> dfloat;
   const hn::ScalableTag<int32_t> dint;
 
   const auto vscale = hn::Set(dfloat, scale);
   const auto vmask = hn::Set(dint, mask);
   const auto vsample_offset = hn::Set(dint, sample_offset);
+  const auto vpi_frac = hn::Set(dfloat, pi_frac);
+
+  const auto term1 = hn::Set(dfloat, TERM1);
+  const auto term2 = hn::Set(dfloat, TERM2);
+  const auto term3 = hn::Set(dfloat, TERM3);
+  const auto term4 = hn::Set(dfloat, TERM4);
 
   size_t i = 0;
   for (; i + hn::Lanes(dfloat) <= n; i += hn::Lanes(dfloat)) {
     const auto vx = hn::LoadU(dfloat, &x[i]);
     const auto scaled = hn::Mul(vx, vscale);
     const auto idx = hn::FloorInt(scaled);
-    const auto idx_masked = hn::And(idx, vmask);
-
+    const auto idx_float = hn::ConvertTo(dfloat, idx);
     const auto idx_cos = hn::Add(idx, vsample_offset);
+    const auto idx_masked = hn::And(idx, vmask);
     const auto idx_cos_masked = hn::And(idx_cos, vmask);
 
-    const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
-    const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
+    const auto dx = hn::Sub(vx, hn::Mul(idx_float, vpi_frac));
+    const auto dx2 = hn::Mul(dx, dx);
+    const auto dx3 = hn::Mul(dx2, dx);
+    const auto dx4 = hn::Mul(dx3, dx);
+
+    const auto t2 = hn::Mul(dx2, term2);
+    const auto t3 = hn::Mul(dx3, term3);
+    const auto t4 = hn::Mul(dx4, term4);
+
+    const auto cosdx = hn::Add(hn::Sub(term1, t2), t4);
+    const auto sindx = hn::Sub(dx, t3);
+
+    auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
+    auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
+
+    sinv = hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
+    cosv = hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
 
     hn::StoreU(sinv, dfloat, &s[i]);
     hn::StoreU(cosv, dfloat, &c[i]);
@@ -127,17 +203,19 @@ HWY_EXPORT(compute_sinf);
 
 void compute_sinf(size_t n, const float *HWY_RESTRICT x,
                   const float *HWY_RESTRICT lookup, const size_t mask,
-                  const float scale, float *HWY_RESTRICT s) {
-  return HWY_DYNAMIC_DISPATCH(compute_sinf)(n, x, lookup, mask, scale, s);
+                  const float scale, const float pi_frac,
+                  const size_t sample_offset, float *HWY_RESTRICT s) {
+  return HWY_DYNAMIC_DISPATCH(compute_sinf)(n, x, lookup, mask, scale, pi_frac,
+                                            sample_offset, s);
 }
 
 HWY_EXPORT(compute_cosf);
 
 void compute_cosf(size_t n, const float *HWY_RESTRICT x,
                   const float *HWY_RESTRICT lookup, const size_t mask,
-                  const float scale, const size_t sample_offset,
-                  float *HWY_RESTRICT c) {
-  return HWY_DYNAMIC_DISPATCH(compute_cosf)(n, x, lookup, mask, scale,
+                  const float scale, const float pi_frac,
+                  const size_t sample_offset, float *HWY_RESTRICT c) {
+  return HWY_DYNAMIC_DISPATCH(compute_cosf)(n, x, lookup, mask, scale, pi_frac,
                                             sample_offset, c);
 }
 
@@ -145,10 +223,11 @@ HWY_EXPORT(compute_sincosf);
 
 void compute_sincosf(size_t n, const float *HWY_RESTRICT x,
                      const float *HWY_RESTRICT lookup, const size_t mask,
-                     const float scale, const size_t sample_offset,
-                     float *HWY_RESTRICT s, float *HWY_RESTRICT c) {
+                     const float scale, const float pi_frac,
+                     const size_t sample_offset, float *HWY_RESTRICT s,
+                     float *HWY_RESTRICT c) {
   return HWY_DYNAMIC_DISPATCH(compute_sincosf)(n, x, lookup, mask, scale,
-                                               sample_offset, s, c);
+                                               pi_frac, sample_offset, s, c);
 }
 
 } // namespace highway_impl
