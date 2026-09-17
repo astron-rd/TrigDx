@@ -84,6 +84,7 @@ if(TRIGDX_USE_HWY)
 
   target_sources(trigdx PRIVATE lookup_highway.cpp
                                 highway/lookup_highway_impl.cpp)
+  target_include_directories(trigdx PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
   target_link_libraries(trigdx PRIVATE hwy)
 endif()
 

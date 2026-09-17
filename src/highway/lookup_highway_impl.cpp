@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #undef HWY_TARGET_INCLUDE
-#define HWY_TARGET_INCLUDE "../../../src/highway/lookup_highway_impl.cpp"
+#define HWY_TARGET_INCLUDE "highway/lookup_highway_impl.cpp"
 #include "hwy/foreach_target.h" // IWYU pragma: keep
 
 // Must come after foreach_target.h to avoid redefinition errors.
