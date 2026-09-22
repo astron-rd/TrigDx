@@ -40,8 +40,6 @@ HWY_ATTR void compute_sinf(size_t n, const T *HWY_RESTRICT x,
 
   const auto term1 = hn::Set(dfloat, TERM1);
   const auto term2 = hn::Set(dfloat, TERM2);
-  const auto term3 = hn::Set(dfloat, TERM3);
-  const auto term4 = hn::Set(dfloat, TERM4);
 
   size_t i = 0;
   for (; i + hn::Lanes(dfloat) <= n; i += hn::Lanes(dfloat)) {
@@ -55,15 +53,11 @@ HWY_ATTR void compute_sinf(size_t n, const T *HWY_RESTRICT x,
 
     const auto dx = hn::Sub(vx, hn::Mul(idx_float, vpi_frac));
     const auto dx2 = hn::Mul(dx, dx);
-    const auto dx3 = hn::Mul(dx2, dx);
-    const auto dx4 = hn::Mul(dx3, dx);
 
     const auto t2 = hn::Mul(dx2, term2);
-    const auto t3 = hn::Mul(dx3, term3);
-    const auto t4 = hn::Mul(dx4, term4);
 
-    const auto cosdx = hn::Add(hn::Sub(term1, t2), t4);
-    const auto sindx = hn::Sub(dx, t3);
+    const auto cosdx = hn::Sub(term1, t2);
+    const auto sindx = dx;
 
     auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
     const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
@@ -93,8 +87,6 @@ HWY_ATTR void compute_cosf(size_t n, const T *HWY_RESTRICT x,
 
   const auto term1 = hn::Set(dfloat, TERM1);
   const auto term2 = hn::Set(dfloat, TERM2);
-  const auto term3 = hn::Set(dfloat, TERM3);
-  const auto term4 = hn::Set(dfloat, TERM4);
 
   size_t i = 0;
   for (; i + hn::Lanes(dfloat) <= n; i += hn::Lanes(dfloat)) {
@@ -108,15 +100,11 @@ HWY_ATTR void compute_cosf(size_t n, const T *HWY_RESTRICT x,
 
     const auto dx = hn::Sub(vx, hn::Mul(idx_float, vpi_frac));
     const auto dx2 = hn::Mul(dx, dx);
-    const auto dx3 = hn::Mul(dx2, dx);
-    const auto dx4 = hn::Mul(dx3, dx);
 
     const auto t2 = hn::Mul(dx2, term2);
-    const auto t3 = hn::Mul(dx3, term3);
-    const auto t4 = hn::Mul(dx4, term4);
 
-    const auto cosdx = hn::Add(hn::Sub(term1, t2), t4);
-    const auto sindx = hn::Sub(dx, t3);
+    const auto cosdx = hn::Sub(term1, t2);
+    const auto sindx = dx;
 
     const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
     auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
@@ -148,8 +136,6 @@ HWY_ATTR void compute_sincosf(size_t n, const T *HWY_RESTRICT x,
 
   const auto term1 = hn::Set(dfloat, TERM1);
   const auto term2 = hn::Set(dfloat, TERM2);
-  const auto term3 = hn::Set(dfloat, TERM3);
-  const auto term4 = hn::Set(dfloat, TERM4);
 
   size_t i = 0;
   for (; i + hn::Lanes(dfloat) <= n; i += hn::Lanes(dfloat)) {
@@ -163,15 +149,11 @@ HWY_ATTR void compute_sincosf(size_t n, const T *HWY_RESTRICT x,
 
     const auto dx = hn::Sub(vx, hn::Mul(idx_float, vpi_frac));
     const auto dx2 = hn::Mul(dx, dx);
-    const auto dx3 = hn::Mul(dx2, dx);
-    const auto dx4 = hn::Mul(dx3, dx);
 
     const auto t2 = hn::Mul(dx2, term2);
-    const auto t3 = hn::Mul(dx3, term3);
-    const auto t4 = hn::Mul(dx4, term4);
 
-    const auto cosdx = hn::Add(hn::Sub(term1, t2), t4);
-    const auto sindx = hn::Sub(dx, t3);
+    const auto cosdx = hn::Sub(term1, t2);
+    const auto sindx = dx;
 
     auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
     auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
