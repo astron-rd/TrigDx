@@ -62,7 +62,8 @@ HWY_ATTR void compute_sinf(size_t n, const T *HWY_RESTRICT x,
     const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
     const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
 
-    const auto sinv_accurate = hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
+    const auto sinv_accurate =
+        hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
 
     hn::StoreU(sinv_accurate, dfloat, &s[i]);
   }
@@ -128,33 +129,34 @@ HWY_ATTR void compute_cosf(size_t n, const T *HWY_RESTRICT x,
     const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
     const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
 
-    const auto cosv_accurate = hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
+    const auto cosv_accurate =
+        hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
 
     hn::StoreU(cosv_accurate, dfloat, &c[i]);
   }
 
   for (; i < n; i += 1) {
-      const auto scaled = x[i] * scale;
-      const auto idx = static_cast<std::size_t>(scaled);
-      const auto idx_float = static_cast<float>(idx);
-      const auto idx_cos = idx + sample_offset;
-      const auto idx_masked = idx & mask;
-      const auto idx_cos_masked = idx_cos & mask;
+    const auto scaled = x[i] * scale;
+    const auto idx = static_cast<std::size_t>(scaled);
+    const auto idx_float = static_cast<float>(idx);
+    const auto idx_cos = idx + sample_offset;
+    const auto idx_masked = idx & mask;
+    const auto idx_cos_masked = idx_cos & mask;
 
-      const auto dx = x[i] - (idx_float * pi_frac);
-      const auto dx2 = dx * dx;
+    const auto dx = x[i] - (idx_float * pi_frac);
+    const auto dx2 = dx * dx;
 
-      const auto t2 = dx2 * TERM2;
+    const auto t2 = dx2 * TERM2;
 
-      const auto cosdx = TERM1 - t2;
-      const auto sindx = dx;
+    const auto cosdx = TERM1 - t2;
+    const auto sindx = dx;
 
-      const auto sinv = lookup[idx_masked];
-      const auto cosv = lookup[idx_cos_masked];
+    const auto sinv = lookup[idx_masked];
+    const auto cosv = lookup[idx_cos_masked];
 
-      const auto cosv_accurate = (cosv * cosdx) - (sinv * sindx);
+    const auto cosv_accurate = (cosv * cosdx) - (sinv * sindx);
 
-      c[i] = cosv_accurate;
+    c[i] = cosv_accurate;
   }
 }
 
@@ -195,37 +197,39 @@ HWY_ATTR void compute_sincosf(size_t n, const T *HWY_RESTRICT x,
     const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
     const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
 
-    const auto sinv_accurate = hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
-    const auto cosv_accurate = hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
+    const auto sinv_accurate =
+        hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
+    const auto cosv_accurate =
+        hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
 
     hn::StoreU(sinv_accurate, dfloat, &s[i]);
     hn::StoreU(cosv_accurate, dfloat, &c[i]);
   }
 
   for (; i < n; i += 1) {
-      const auto scaled = x[i] * scale;
-      const auto idx = static_cast<std::size_t>(scaled);
-      const auto idx_float = static_cast<float>(idx);
-      const auto idx_cos = idx + sample_offset;
-      const auto idx_masked = idx & mask;
-      const auto idx_cos_masked = idx_cos & mask;
+    const auto scaled = x[i] * scale;
+    const auto idx = static_cast<std::size_t>(scaled);
+    const auto idx_float = static_cast<float>(idx);
+    const auto idx_cos = idx + sample_offset;
+    const auto idx_masked = idx & mask;
+    const auto idx_cos_masked = idx_cos & mask;
 
-      const auto dx = x[i] - (idx_float * pi_frac);
-      const auto dx2 = dx * dx;
+    const auto dx = x[i] - (idx_float * pi_frac);
+    const auto dx2 = dx * dx;
 
-      const auto t2 = dx2 * TERM2;
+    const auto t2 = dx2 * TERM2;
 
-      const auto cosdx = TERM1 - t2;
-      const auto sindx = dx;
+    const auto cosdx = TERM1 - t2;
+    const auto sindx = dx;
 
-      const auto sinv = lookup[idx_masked];
-      const auto cosv = lookup[idx_cos_masked];
+    const auto sinv = lookup[idx_masked];
+    const auto cosv = lookup[idx_cos_masked];
 
-      const auto sinv_accurate = (cosv * sindx) + (sinv * cosdx);
-      const auto cosv_accurate = (cosv * cosdx) - (sinv * sindx);
+    const auto sinv_accurate = (cosv * sindx) + (sinv * cosdx);
+    const auto cosv_accurate = (cosv * cosdx) - (sinv * sindx);
 
-      s[i] = sinv_accurate;
-      c[i] = cosv_accurate;
+    s[i] = sinv_accurate;
+    c[i] = cosv_accurate;
   }
 }
 
