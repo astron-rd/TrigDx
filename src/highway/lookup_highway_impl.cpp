@@ -59,12 +59,12 @@ HWY_ATTR void compute_sinf(size_t n, const T *HWY_RESTRICT x,
     const auto cosdx = hn::Sub(term1, t2);
     const auto sindx = dx;
 
-    auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
+    const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
     const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
 
-    sinv = hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
+    const auto sinv_accurate = hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
 
-    hn::StoreU(sinv, dfloat, &s[i]);
+    hn::StoreU(sinv_accurate, dfloat, &s[i]);
   }
 
   for (; i < n; i += 1) {
@@ -107,11 +107,11 @@ HWY_ATTR void compute_cosf(size_t n, const T *HWY_RESTRICT x,
     const auto sindx = dx;
 
     const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
-    auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
+    const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
 
-    cosv = hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
+    const auto cosv_accurate = hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
 
-    hn::StoreU(cosv, dfloat, &c[i]);
+    hn::StoreU(cosv_accurate, dfloat, &c[i]);
   }
 
   for (; i < n; i += 1) {
@@ -155,14 +155,14 @@ HWY_ATTR void compute_sincosf(size_t n, const T *HWY_RESTRICT x,
     const auto cosdx = hn::Sub(term1, t2);
     const auto sindx = dx;
 
-    auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
-    auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
+    const auto sinv = hn::GatherIndex(dfloat, lookup, idx_masked);
+    const auto cosv = hn::GatherIndex(dfloat, lookup, idx_cos_masked);
 
-    sinv = hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
-    cosv = hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
+    const auto sinv_accurate = hn::Add(hn::Mul(cosv, sindx), hn::Mul(sinv, cosdx));
+    const auto cosv_accurate = hn::Sub(hn::Mul(cosv, cosdx), hn::Mul(sinv, sindx));
 
-    hn::StoreU(sinv, dfloat, &s[i]);
-    hn::StoreU(cosv, dfloat, &c[i]);
+    hn::StoreU(sinv_accurate, dfloat, &s[i]);
+    hn::StoreU(cosv_accurate, dfloat, &c[i]);
   }
 
   for (; i < n; i += 1) {
