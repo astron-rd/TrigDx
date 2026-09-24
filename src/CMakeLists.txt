@@ -71,7 +71,8 @@ if(TRIGDX_USE_HWY)
     hwy
     GIT_REPOSITORY https://github.com/google/highway.git
     GIT_TAG 1.4.0
-    FIND_PACKAGE_ARGS NAMES HWY)
+    FIND_PACKAGE_ARGS NAMES HWY) # tries to use find_package before downloading the source
+    # https://cmake.org/cmake/help/latest/module/FetchContent.html#integrating-with-find-package
   set(HWY_ENABLE_CONTRIB
       OFF
       CACHE BOOL "")
