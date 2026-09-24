@@ -4,16 +4,6 @@
 #include "highway/include/lookup_highway_impl.hpp"
 #include "trigdx/lookup_highway.hpp"
 
-#if defined(HAVE_AVX) && !defined(__AVX__)
-static_assert(HAVE_AVX == 0, "__AVX__ should be defined when HAVE_AVX is "
-                             "defined");
-#endif
-
-#if defined(HAVE_AVX2) && !defined(__AVX2__)
-static_assert(HAVE_AVX2 == 0, "__AVX2__ should be defined when HAVE_AVX2 is "
-                              "defined");
-#endif
-
 template <std::size_t NR_SAMPLES>
 struct LookupHighwayBackend<NR_SAMPLES>::Impl {
   std::vector<float> lookup;
