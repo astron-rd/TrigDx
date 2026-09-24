@@ -34,3 +34,9 @@ if(TRIGDX_USE_XSIMD)
   target_link_libraries(benchmark_lookup_xsimd PRIVATE trigdx
                                                        benchmark::benchmark)
 endif()
+
+if(TRIGDX_USE_HWY)
+  add_executable(benchmark_lookup_highway benchmark_lookup_highway.cpp)
+  target_link_libraries(benchmark_lookup_highway PRIVATE trigdx
+                                                         benchmark::benchmark)
+endif()

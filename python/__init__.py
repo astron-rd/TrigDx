@@ -14,3 +14,8 @@ try:
     from .trigdx import LookupXSIMD16K, LookupXSIMD32K
 except ImportError:
     pass
+
+try:
+    from .trigdx import LookupHighway16K, LookupHighway32K
+except ImportError:
+    pass

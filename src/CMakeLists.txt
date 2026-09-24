@@ -43,27 +43,51 @@ endif()
 
 if(TRIGDX_USE_XSIMD)
   # Requires XSIMD > 13 for architecture independent dispatching
-  find_package(xsimd 13 QUIET)
-  if(NOT TARGET xsimd)
-    FetchContent_Declare(
-      xsimd
-      GIT_REPOSITORY https://github.com/xtensor-stack/xsimd.git
-      GIT_TAG 13.2.0)
-    FetchContent_MakeAvailable(xsimd)
-  endif()
+  FetchContent_Declare(
+    xsimd
+    GIT_REPOSITORY
+      https://github.com/xtensor-stack/xsimd.git # ...otherwise fall back to
+                                                 # downloading
+    GIT_TAG 13.2.0
+    FIND_PACKAGE_ARGS 13) # try with find_package first...
+  FetchContent_MakeAvailable(xsimd)
 
   # Requires xtl > 0.7.x for XSIMD > 13
-  find_package(xtl 0.7.7 QUIET)
-  if(NOT TARGET xtl)
-    FetchContent_Declare(
-      xtl
-      GIT_REPOSITORY https://github.com/xtensor-stack/xtl.git
-      GIT_TAG 0.7.7)
-    FetchContent_MakeAvailable(xtl)
-  endif()
+  FetchContent_Declare(
+    xtl
+    GIT_REPOSITORY
+      https://github.com/xtensor-stack/xtl.git # ...otherwise fall back to
+                                               # downloading
+    GIT_TAG 0.7.7
+    FIND_PACKAGE_ARGS 0.7.7) # try with find_package first...
+  FetchContent_MakeAvailable(xtl)
 
   target_sources(trigdx PRIVATE lookup_xsimd.cpp)
   target_link_libraries(trigdx PRIVATE xsimd xtl)
+endif()
+
+if(TRIGDX_USE_HWY)
+  FetchContent_Declare(
+    hwy
+    GIT_REPOSITORY https://github.com/google/highway.git # ...otherwise fall
+                                                         # back to downloading
+    GIT_TAG 1.4.0
+    FIND_PACKAGE_ARGS NAMES HWY) # try with find_package first...
+  set(HWY_ENABLE_CONTRIB
+      OFF
+      CACHE BOOL "")
+  set(HWY_ENABLE_EXAMPLES
+      OFF
+      CACHE BOOL "")
+  set(HWY_ENABLE_TESTS
+      OFF
+      CACHE BOOL "")
+  FetchContent_MakeAvailable(hwy)
+
+  target_sources(trigdx PRIVATE lookup_highway.cpp
+                                highway/lookup_highway_impl.cpp)
+  target_include_directories(trigdx PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(trigdx PRIVATE hwy)
 endif()
 
 target_include_directories(

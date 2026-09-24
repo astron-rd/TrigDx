@@ -3,3 +3,4 @@
 #cmakedefine TRIGDX_USE_MKL
 #cmakedefine TRIGDX_USE_GPU
 #cmakedefine TRIGDX_USE_XSIMD
+#cmakedefine TRIGDX_USE_HWY
