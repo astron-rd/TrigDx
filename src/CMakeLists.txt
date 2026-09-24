@@ -70,7 +70,8 @@ if(TRIGDX_USE_HWY)
   FetchContent_Declare(
     hwy
     GIT_REPOSITORY https://github.com/google/highway.git
-    GIT_TAG 1.4.0)
+    GIT_TAG 1.4.0
+    FIND_PACKAGE_ARGS NAMES HWY)
   set(HWY_ENABLE_CONTRIB
       OFF
       CACHE BOOL "")
