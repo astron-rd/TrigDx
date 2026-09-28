@@ -12,16 +12,12 @@ jobs:
             partition: defq
             gres: gpu:A4000
             cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_MKL=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
-            environment_modules: "spack/20250403 intel-oneapi-mkl cuda python"
+            environment_modules: "spack intel-oneapi-mkl cuda python"
           - name: Intel, NVIDIA A4000
             partition: defq
             gres: gpu:A4000
             cmake_flags: "-DTRIGDX_USE_MKL=1 -DTRIGDX_USE_GPU=1 -DTRIGDX_USE_MKL=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=86"
-            environment_modules: "spack/20250403 intel-oneapi-compilers intel-oneapi-mkl cuda python"
-          - name: NVIDIA GH200
-            partition: ghq
-            gres: gpu:GH200
-            cmake_flags: "-DTRIGDX_USE_GPU=1 -DTRIGDX_USE_XSIMD=1 -DCMAKE_CUDA_ARCHITECTURES=90a -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc"
+            environment_modules: "spack intel-oneapi-compilers intel-oneapi-mkl cuda python"
     env:
       DEVICE_NAME: ${{ matrix.name }}
       PARTITION_NAME: ${{ matrix.partition }}
@@ -34,7 +30,7 @@ jobs:
           rm -rf $GITHUB_WORKSPACE/*
           mkdir -p $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-      - uses: astron-rd/slurm-action@v1.2
+      - uses: astron-rd/slurm-action@v1.3
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
@@ -61,7 +57,7 @@ jobs:
       - uses: pyTooling/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
-      - uses: astron-rd/slurm-action@v1.2
+      - uses: astron-rd/slurm-action@v1.3
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
@@ -81,7 +77,7 @@ jobs:
       - uses: pyTooling/download-artifact@v4
         with:
           name: build-${{ matrix.name }}
-      - uses: astron-rd/slurm-action@v1.2
+      - uses: astron-rd/slurm-action@v1.3
         with:
           partition: ${{ matrix.partition }}
           gres: ${{ matrix.gres }}
