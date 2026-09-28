@@ -37,7 +37,18 @@ Common CMake options:
 - `TRIGDX_USE_GPU=ON/OFF` — build GPU support.
 - `TRIGDX_BUILD_TESTS=ON/OFF` — build tests.
 - `TRIGDX_BUILD_BENCHMARKS=ON/OFF` — build benchmarks.
+- `TRIGDX_BUILD_EXAMPLES=ON/OFF` — build example programs.
 - `TRIGDX_BUILD_PYTHON` — build Python interface.
+
+## Code example
+A simple standalone example is available at `examples/basic_usage.cpp`.
+
+To build and run it:
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DTRIGDX_BUILD_EXAMPLES=ON
+cmake --build build --target example_basic_usage -j
+./build/examples/example_basic_usage
+```
 
 ## Contributing
 - Fork → create a feature branch → open a PR.
