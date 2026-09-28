@@ -93,4 +93,8 @@ PYBIND11_MODULE(trigdx, m) {
   bind_backend<LookupXSIMDBackend<16384>>(m, "LookupXSIMD16K");
   bind_backend<LookupXSIMDBackend<32768>>(m, "LookupXSIMD32K");
 #endif
+#if defined(TRIGDX_USE_HWY)
+  bind_backend<LookupHighwayBackend<16384>>(m, "LookupHighway16K");
+  bind_backend<LookupHighwayBackend<32768>>(m, "LookupHighway32K");
+#endif
 }

@@ -17,3 +17,7 @@
 #if defined(TRIGDX_USE_XSIMD)
 #include <trigdx/lookup_xsimd.hpp>
 #endif
+
+#if defined(TRIGDX_USE_HWY)
+#include <trigdx/lookup_highway.hpp>
+#endif
