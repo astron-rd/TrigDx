@@ -1,14 +1,16 @@
+#include "trigdx/lookup_xsimd.hpp"
+
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 #include <vector>
 #include <xsimd/xsimd.hpp>
-
-#include "trigdx/lookup_xsimd.hpp"
 
 template <std::size_t NR_SAMPLES> struct lookup_table {
   static constexpr std::size_t MASK = NR_SAMPLES - 1;
   static constexpr float SCALE = NR_SAMPLES / (2.0f * float(M_PI));
-  static constexpr float PI_FRAC = 2.0f * M_PIf32 / NR_SAMPLES;
+  static constexpr float PI_FRAC =
+      2.0f * std::numbers::pi_v<float> / NR_SAMPLES;
   static constexpr float TERM1 = 1.0f;         // 1
   static constexpr float TERM2 = 0.5f;         // 1/2!
   static constexpr float TERM3 = 1.0f / 6.0f;  // 1/3!
